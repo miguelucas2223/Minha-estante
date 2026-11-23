@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="./favicon.png?v=3" type="image/png">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#11131a">
+  <title>Minha Estante — Rastreador de filmes e séries</title>
+  <style>
+    :root{
+      color-scheme:dark;
+      --bg:#101218;--panel:#181b24;--panel2:#1e222d;--line:#2b3040;
+      --text:#f2f0eb;--muted:#a4a8b5;--accent:#2563eb;--accent2:#8b5cf6;
+      --accent-soft:rgba(37,99,235,.18);--accent-border:rgba(139,92,246,.48);
+      --accent-glow:rgba(37,99,235,.22);--accent-glow2:rgba(139,92,246,.18);
+      --accent-surface:rgba(139,92,246,.18);
+      --green:#8bd6b0;--yellow:#e8c982;--red:#e38d99;--shadow:0 18px 55px #0005;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:radial-gradient(ellipse at 78% -10%,var(--accent-glow) 0,transparent 38%),radial-gradient(ellipse at 5% 18%,var(--accent-glow2) 0,transparent 31%),var(--bg);color:var(--text);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;transition:background .25s ease}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    .shell{max-width:1440px;margin:auto;padding:28px 34px 54px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:30px}
+    .brand{display:flex;gap:14px;align-items:center}
+    .brand-mark{width:45px;height:45px;display:grid;place-items:center;border:1px solid var(--accent-border);border-radius:15px;background:linear-gradient(145deg,var(--accent2),var(--accent));font-size:22px;box-shadow:0 8px 25px #0004}
+    .brand h1{font-size:20px;letter-spacing:.2px;margin:0;font-weight:750}
+    .brand p{margin:2px 0 0;color:var(--muted);font-size:12px;letter-spacing:.3px}
+    .header-actions{display:flex;gap:10px;align-items:center}
+    .btn{border:1px solid var(--line);color:var(--text);background:var(--panel2);padding:10px 14px;border-radius:11px;font-weight:650;transition:.18s ease}
+    .btn:hover{transform:translateY(-1px);border-color:var(--accent2);background:#282433}
+    .btn.primary{background:linear-gradient(110deg,var(--accent),var(--accent2));border-color:transparent;color:#fff}
+    .btn.primary:hover{filter:brightness(1.12)}
+    .btn.subtle{background:transparent}
+    .btn.danger{color:#f2a6af;border-color:#74434b}
+    .hero{display:flex;justify-content:space-between;align-items:end;gap:20px;margin:8px 0 22px}
+    .eyebrow{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;margin-bottom:7px}
+    .hero h2{font-size:clamp(25px,4vw,34px);line-height:1.13;letter-spacing:-1px;margin:0 0 8px}
+    .hero p{color:var(--muted);margin:0;max-width:620px}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin:24px 0 28px}
+    .stat{background:linear-gradient(145deg,#1c202b,#171a22);border:1px solid var(--line);border-radius:15px;padding:16px 18px;min-height:89px}
+    .stat-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px}
+    .stat-icon{font-size:17px;opacity:.9}
+    .stat strong{display:block;font-size:27px;line-height:1.1;margin-top:9px;letter-spacing:-.7px}
+    .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:17px}
+    .search-wrap{position:relative;flex:1;min-width:190px}
+    .search-wrap span{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#858b9c}
+    .search-wrap input{padding-left:39px;width:100%}
+    input,select,textarea{background:#11141c;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:11px 12px;outline:none;min-width:0}
+    input:focus,select:focus,textarea:focus{border-color:var(--accent2);box-shadow:0 0 0 3px var(--accent-soft)}
+    select{cursor:pointer}
+    .toolbar select{min-width:150px}
+    .tabs{display:flex;gap:7px;overflow-x:auto;padding:2px 0 12px;margin-bottom:8px;scrollbar-width:thin}
+    .tab{white-space:nowrap;background:transparent;color:var(--muted);border:1px solid transparent;border-radius:9px;padding:8px 12px;font-weight:650}
+    .tab:hover{color:var(--text);background:#ffffff08}
+    .tab.active{color:var(--text);background:var(--accent-surface);border-color:var(--accent-border)}
+    .tab span{color:#aaa0b8;font-size:12px;margin-left:5px}
+    .section-head{display:flex;justify-content:space-between;align-items:center;margin:11px 0 14px}
+    .section-head h3{margin:0;font-size:16px}
+    .section-head small{color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .media-card{background:linear-gradient(150deg,#1b1f29,#171a22);border:1px solid var(--line);border-radius:15px;padding:16px;min-width:0;position:relative;transition:.2s ease}
+    .media-card:hover{border-color:#4e435f;transform:translateY(-2px);box-shadow:0 12px 28px #0002}
+    .card-top{display:flex;align-items:flex-start;gap:12px}
+    .cover{width:57px;height:72px;flex:0 0 57px;border-radius:9px;background:linear-gradient(150deg,var(--accent2),#252636);display:grid;place-items:center;font-size:25px;border:1px solid #ffffff12;overflow:hidden}
+    .cover img{width:100%;height:100%;object-fit:cover}
+    .card-main{min-width:0;flex:1}
+    .card-main h4{margin:2px 0 5px;font-size:16px;line-height:1.28;overflow-wrap:anywhere}
+    .meta{color:var(--muted);font-size:12px;display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+    .dot{width:3px;height:3px;border-radius:50%;background:#777;display:inline-block}
+    .status{font-size:10px;letter-spacing:.35px;text-transform:uppercase;font-weight:800;padding:5px 7px;border-radius:6px;white-space:nowrap;background:#34313e;color:#d7c0ff}
+    .status.assistindo{background:#244235;color:#9ce0bc}.status.quero{background:#3a304b;color:#d4baff}.status.pausado{background:#453b27;color:#f0d18a}.status.concluido{background:#263b40;color:#a5dce1}.status.abandonado{background:#452c34;color:#e9aab4}
+    .card-info{margin:14px 0 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:#c9c7d0}
+    .position{color:var(--muted);overflow-wrap:anywhere}
+    .rating{color:#e9ce8d;white-space:nowrap}
+    .progress{height:5px;background:#303442;border-radius:9px;overflow:hidden;margin:0 0 13px}
+    .progress>i{height:100%;display:block;border-radius:9px;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0}
+    .progress-note{font-size:11px;color:var(--muted);margin-top:-7px;margin-bottom:12px}
+    .card-actions{display:flex;gap:7px;align-items:center;border-top:1px solid #ffffff0c;padding-top:12px}
+    .card-actions button{background:transparent;border:1px solid var(--line);color:#d4d2dc;border-radius:8px;padding:7px 9px;font-size:12px;font-weight:650}
+    .card-actions button:hover{background:#ffffff0a;border-color:#66547e}
+    .card-actions .grow{flex:1}
+    .empty{border:1px dashed #45404f;border-radius:16px;text-align:center;padding:52px 20px;color:var(--muted);grid-column:1/-1}
+    .empty .big{font-size:34px;margin-bottom:10px}
+    .empty h3{color:var(--text);margin:0 0 6px}
+    .empty p{margin:0 0 17px}
+    footer{margin-top:35px;padding-top:16px;border-top:1px solid #ffffff10;color:#838796;font-size:11px;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}
+    .modal-backdrop{position:fixed;inset:0;background:#090a0fbd;backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;padding:20px;z-index:10}
+    .modal-backdrop.open{display:flex}
+    .modal{width:min(650px,100%);max-height:min(90vh,850px);overflow:auto;background:#1a1d27;border:1px solid #414052;border-radius:18px;box-shadow:var(--shadow);padding:23px}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:17px}
+    .modal-head h3{margin:0;font-size:20px}
+    .close{border:0;background:transparent;color:var(--muted);font-size:24px;padding:0 5px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+    .field{display:flex;flex-direction:column;gap:6px;min-width:0}
+    .field.full{grid-column:1/-1}
+    .field label{font-size:12px;color:#c4c2cc;font-weight:700}
+    .field small{font-size:11px;color:#858a98}
+    textarea{resize:vertical;min-height:76px}
+    .modal-actions{display:flex;justify-content:space-between;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #ffffff10}
+    .modal-actions-right{display:flex;gap:8px}
+    .star-rating{display:inline-flex;gap:1px;white-space:nowrap;color:#f5c451;font-size:15px;letter-spacing:0}.star-rating .star{display:inline-block;background:linear-gradient(90deg,#f5c451 var(--fill,100%),#62616a var(--fill,100%));-webkit-background-clip:text;background-clip:text;color:transparent}.diary-entry-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.diary-entry-actions button{font-size:12px}\n    html body .hidden{display:none!important}
+    .main-nav{flex-wrap:wrap}
+    .diary-rating{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:2px 0 5px}
+    .diary-rating-buttons{display:flex;gap:2px}
+    .diary-rating-buttons button{border:0;background:transparent;padding:2px;color:#62616a;font-size:25px;line-height:1;cursor:pointer}
+    .diary-rating-buttons button.active{color:#f5c451}.diary-rating-buttons button.half{background:linear-gradient(90deg,#f5c451 50%,#62616a 50%);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .diary-rating-buttons button:focus-visible{outline:2px solid var(--accent);border-radius:5px}.rating .star-rating{font-size:13px}.star-rating{vertical-align:middle}
+    .diary-rating-score{color:var(--muted);font-size:12px;min-width:50px}
+    .toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);background:#e7d8ff;color:#21192b;padding:10px 15px;border-radius:10px;font-weight:700;font-size:13px;opacity:0;pointer-events:none;transition:.22s;z-index:20;box-shadow:var(--shadow)}
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+
+    /* Navegação por controle de videogame */
+    :focus-visible{outline:3px solid var(--accent)!important;outline-offset:3px;box-shadow:0 0 0 5px var(--accent-soft)!important}
+    .controller-hint{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:2px 0 12px;padding:10px 13px;border:1px solid #373044;border-radius:11px;background:#1b1824;color:#c9c1d8;font-size:12px}
+    .controller-hint strong{color:#e2d2ff}
+    .controller-status{color:var(--muted)}.controller-status.connected{color:var(--green)}
+    .controller-actions{display:flex;align-items:center;gap:10px}
+    .controller-settings{margin:0 0 14px;padding:15px 16px;border:1px solid #40364e;border-radius:13px;background:#191722}
+    .controller-settings-head{display:flex;justify-content:space-between;align-items:end;gap:18px;flex-wrap:wrap}
+    .controller-settings-head strong{display:block;color:#e9ddff;font-size:14px}
+    .controller-settings-head p{margin:4px 0 0;color:var(--muted);font-size:12px;max-width:620px}
+    .controller-type-field{display:flex;flex-direction:column;gap:5px;min-width:min(260px,100%)}
+    .controller-type-field label,.mapping-field label{font-size:11px;color:#c9c1d8;font-weight:750}
+    .controller-type-field select{width:100%}
+    .controller-mapping{display:grid;grid-template-columns:repeat(3,minmax(130px,1fr));gap:10px;margin-top:14px;padding-top:13px;border-top:1px solid #ffffff12}
+    .mapping-field{display:flex;flex-direction:column;gap:5px;min-width:0}
+    .mapping-field select{width:100%;padding:9px 10px;font-size:12px}
+    .controller-foot{color:#888b9b;font-size:11px;margin:11px 0 0}
+    .vk-backdrop{display:none;position:fixed;inset:0;z-index:30;align-items:flex-end;justify-content:center;padding:12px;pointer-events:none}
+    .vk-backdrop.open{display:flex}
+    .vk-panel{pointer-events:auto;width:min(760px,100%);max-height:48vh;overflow:auto;padding:14px;background:#191c27;border:1px solid #625178;border-radius:17px;box-shadow:0 18px 60px #000b}
+    .vk-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;color:#e9ddff;font-size:13px;font-weight:750}
+    .vk-head small{font-size:11px;color:var(--muted);font-weight:500}
+    .vk-rows{display:grid;gap:6px}
+    .vk-row{display:flex;justify-content:center;gap:5px}
+    .vk-key{min-width:0;flex:1;padding:9px 5px;border:1px solid #3b4050;border-radius:8px;background:#272b38;color:#f2f0eb;font-size:14px;font-weight:650;touch-action:manipulation}
+    .vk-key.wide{flex:1.8;background:#343044;border-color:#58476e}
+    .vk-key.space{flex:5}
+    .vk-key.action{background:#473960;border-color:#765d97;color:#fff}
+    .vk-key:hover,.vk-key:focus-visible{background:#57436f}
+    .theme-settings{margin:-12px 0 22px;padding:17px;border:1px solid var(--accent-border);border-radius:15px;background:linear-gradient(125deg,#1b202c,#191b26);box-shadow:0 12px 35px #0002}
+    .theme-settings-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:14px}
+    .theme-settings-head strong{font-size:15px}.theme-settings-head p{margin:4px 0 0;color:var(--muted);font-size:12px;max-width:650px}
+    .theme-grid{display:grid;grid-template-columns:1.1fr 1.5fr 1fr 1fr;gap:11px;align-items:end}
+    .theme-field{display:flex;flex-direction:column;gap:6px;min-width:0}.theme-field label{font-size:11px;color:#c9cfdd;font-weight:750}
+    .theme-field select{width:100%;padding:10px 11px;font-size:12px}
+    .theme-color{display:flex;align-items:center;gap:8px;min-height:42px;padding:5px 9px;border:1px solid var(--line);border-radius:10px;background:#11141c}
+    .theme-color input{width:34px;height:28px;padding:0;border:0;border-radius:6px;background:transparent;cursor:pointer}
+    .theme-color span{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+    .theme-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:13px}
+    .theme-hint{font-size:11px;color:var(--muted);margin:10px 0 0}
+    .theme-preview{height:8px;max-width:230px;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));margin-top:12px}
+    @media(max-width:800px){.theme-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:600px){.controller-hint{font-size:11px}.controller-settings{padding:12px}.controller-settings-head{align-items:stretch}.controller-mapping{grid-template-columns:repeat(2,minmax(0,1fr))}.vk-backdrop{padding:7px}.vk-panel{max-height:53vh;padding:9px}.vk-key{padding:10px 3px;font-size:12px}.vk-row{gap:3px}.theme-settings{padding:13px}.theme-settings-head{flex-direction:column}.theme-grid{grid-template-columns:1fr 1fr}}
+
+    @media(max-width:1000px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:680px){.shell{padding:19px 15px 35px}header{align-items:flex-start}.brand p{max-width:180px}.header-actions .label{display:none}.btn{padding:10px 11px}.hero{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:repeat(2,1fr);gap:9px}.stat{padding:13px}.stat strong{font-size:24px}.grid{grid-template-columns:1fr}.toolbar{gap:8px}.toolbar select{flex:1;min-width:120px}.form-grid{grid-template-columns:1fr 1fr}.modal{padding:18px}.card-actions button{padding:8px}}
+    @media(max-width:390px){.brand-mark{width:39px;height:39px}.brand h1{font-size:18px}.header-actions{gap:6px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.stats{gap:8px}}
+
+    .main-nav{display:flex;gap:8px;margin:3px 0 20px;border-bottom:1px solid var(--line);padding-bottom:12px}
+    .main-nav button{border:1px solid transparent;background:transparent;color:var(--muted);padding:10px 15px;border-radius:10px;font-weight:750}
+    .main-nav button.active{background:var(--accent-surface);border-color:var(--accent-border);color:var(--text)}
+    .view-toggle{display:flex;gap:6px;align-items:center}
+    .view-toggle button{border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--muted);padding:7px 10px;font-size:12px;font-weight:700}
+    .view-toggle button.active{border-color:var(--accent-border);color:var(--text);background:var(--accent-surface)}
+    .poster-cover{width:57px;height:78px;flex:0 0 57px;border-radius:8px;overflow:hidden;background:linear-gradient(145deg,var(--accent2),#242938);display:grid;place-items:center;font-size:23px;border:1px solid #ffffff18}
+    .poster-cover img{width:100%;height:100%;object-fit:cover}
+    .dvd-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(82px,1fr));gap:27px 12px;padding:18px 14px 30px;border:1px solid #44372e;border-radius:15px;background:linear-gradient(180deg,#211b18,#171615 75%,#2a1c13);box-shadow:inset 0 0 35px #0005;position:relative}
+    .dvd-case{height:174px;min-width:0;position:relative;cursor:pointer;outline:none;filter:drop-shadow(4px 7px 4px #0008);transition:transform .18s ease,filter .18s ease}
+    .dvd-case:hover,.dvd-case:focus-visible{transform:translateY(-7px);filter:drop-shadow(5px 11px 6px #0009)}
+    .dvd-spine{height:100%;width:100%;position:relative;overflow:hidden;border-radius:4px 7px 7px 4px;border:1px solid #ffffff40;background:linear-gradient(90deg,#0005,transparent 12%,#ffffff15 20%,transparent 38%),linear-gradient(145deg,var(--dvd-color),#171a22);box-shadow:inset 4px 0 5px #0007,inset -3px 0 4px #fff2;display:flex;align-items:center;justify-content:center}
+    .dvd-spine:before{content:'';position:absolute;top:0;left:5px;bottom:0;width:3px;background:#ffffff24;box-shadow:2px 0 2px #0005}
+    .dvd-title{writing-mode:vertical-rl;transform:rotate(180deg);font-size:12px;line-height:1.05;font-weight:850;letter-spacing:.4px;text-align:center;text-shadow:0 1px 3px #000b;max-height:145px;overflow:hidden;padding:7px 0;max-width:35px;overflow-wrap:anywhere}
+    .dvd-kind{position:absolute;top:6px;right:5px;font-size:9px;background:#090b10a8;border:1px solid #ffffff35;border-radius:4px;padding:2px 3px}
+    .dvd-ribbon{position:absolute;bottom:5px;left:6px;right:6px;font-size:8px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#090b10b8;border-radius:3px;padding:3px}
+    .dvd-actions{position:absolute;top:-8px;right:-6px;display:flex;gap:3px;opacity:0;transition:opacity .15s}
+    .dvd-case:hover .dvd-actions,.dvd-case:focus-within .dvd-actions{opacity:1}
+    .dvd-actions button{border:1px solid #ffffff55;border-radius:50%;width:24px;height:24px;background:#171b25;color:white;font-size:12px}
+    .discover-view{margin:0 0 20px}
+    .discover-heading{margin:5px 0 18px}
+    .discover-heading .eyebrow{margin-bottom:7px}
+    .discover-heading h2{font-size:clamp(25px,4vw,34px);margin:0 0 7px;letter-spacing:-.8px}
+    .discover-heading p{margin:0;color:var(--muted);max-width:740px}
+    .tmdb-setup{border:1px solid var(--accent-border);border-radius:14px;padding:15px 17px;background:linear-gradient(125deg,#1c2230,#1c1a29);margin:16px 0}
+    .tmdb-setup strong{display:block;margin-bottom:5px}
+    .tmdb-setup p{color:var(--muted);font-size:12px;margin:5px 0 10px}
+    .tmdb-setup-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .tmdb-setup-row input{flex:1;min-width:220px}
+    .tmdb-setup a,.tmdb-credit a{color:#b9a3ff}
+    .discover-tools{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:12px 0}
+    .discover-tools input{flex:1;min-width:200px}
+    .discover-tabs{display:flex;gap:7px;overflow:auto;padding:3px 0 10px;margin:8px 0 5px}
+    .discover-tabs button{white-space:nowrap;border:1px solid transparent;background:transparent;color:var(--muted);border-radius:9px;padding:8px 11px;font-weight:700}
+    .discover-tabs button.active{background:var(--accent-surface);border-color:var(--accent-border);color:var(--text)}
+    .discover-status{color:var(--muted);font-size:12px;margin:9px 0 13px;min-height:18px}
+    .discovery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+    .discovery-card{display:flex;gap:13px;min-width:0;padding:12px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(145deg,#1d222d,#171a22)}
+    .discovery-poster{flex:0 0 94px;width:94px;height:140px;object-fit:cover;border-radius:8px;background:linear-gradient(145deg,var(--accent),var(--accent2));border:1px solid #ffffff18}
+    .discovery-placeholder{display:grid;place-items:center;font-size:25px;color:#fff}
+    .discovery-info{min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+    .discovery-info h4{margin:0;font-size:14px;line-height:1.25;overflow-wrap:anywhere}
+    .discovery-meta{font-size:11px;color:var(--muted);display:flex;gap:7px;flex-wrap:wrap}
+    .discovery-overview{font-size:11px;line-height:1.4;color:#c3c5ce;margin:2px 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+    .discovery-info .btn{margin-top:auto;padding:7px 9px;font-size:11px}
+    .tmdb-credit{font-size:10px;line-height:1.5;color:#818696;margin:20px 0 0;padding-top:12px;border-top:1px solid #ffffff12}
+    .tmdb-credit strong{color:#c4c7d2}
+    .discover-empty{grid-column:1/-1;text-align:center;padding:34px 18px;border:1px dashed #45404f;border-radius:14px;color:var(--muted)}
+    .discover-empty strong{display:block;color:var(--text);margin-bottom:5px}
+    .personal-view{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:18px;margin:12px 0 20px}.personal-view h2{margin:0 0 6px}.personal-view p{color:var(--muted);font-size:13px}.diary-form{display:grid;grid-template-columns:1fr 180px;gap:9px;margin:14px 0}.diary-form textarea{grid-column:1/-1;min-height:85px}.diary-list{display:grid;gap:9px}.diary-entry,.achievement{padding:13px;border:1px solid var(--line);border-radius:12px;background:#ffffff06}.diary-entry small{color:var(--muted)}.personal-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}.personal-stat{padding:16px;border:1px solid var(--line);border-radius:13px;background:linear-gradient(140deg,#202b40,#211d35)}.personal-stat strong{font-size:25px;display:block}.personal-stat span{font-size:12px;color:var(--muted)}.achievement-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}.achievement{display:flex;gap:11px;align-items:center}.achievement .medal{font-size:27px}.achievement.locked{opacity:.42;filter:grayscale(1)}.achievement strong{display:block}.achievement small{color:var(--muted)}
+    @media(max-width:760px){.diary-form{grid-template-columns:1fr}.diary-form textarea{grid-column:auto}.personal-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.discovery-grid{grid-template-columns:1fr}.discovery-card{gap:10px}.discovery-poster{flex-basis:78px;width:78px;height:116px}.dvd-view{grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:22px 9px;padding:14px 9px}.dvd-case{height:148px}.dvd-title{font-size:10px;max-height:122px}}
+    @media(max-width:560px){.main-nav{margin-bottom:15px}.main-nav button{flex:1}.section-head{align-items:flex-start;flex-direction:column;gap:9px}.view-toggle{width:100%}.view-toggle button{flex:1}.tmdb-setup{padding:13px}.tmdb-setup-row input{min-width:100%}.discovery-overview{-webkit-line-clamp:2}}
+
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark">✦</div>
+        <div><h1>Minha Estante</h1><p>Seu cantinho para acompanhar histórias</p></div>
+      </div>
+      <div class="header-actions">
+        <button class="btn subtle" id="exportBtn" title="Salvar uma cópia dos seus dados">⇩ <span class="label">Backup</span></button>
+        <button class="btn subtle" id="importBtn" title="Restaurar um backup">⇧ <span class="label">Importar</span></button>
+        <button class="btn subtle" id="themeSettingsBtn" title="Personalizar aparência" aria-expanded="false">🎨 <span class="label">Tema</span></button>
+        <input type="file" id="importFile" accept="application/json,.json" class="hidden">
+        <button class="btn primary" id="addBtn">＋ <span class="label">Adicionar título</span></button>
+      </div>
+    </header>
+
+    <section class="theme-settings hidden" id="themeSettings" aria-label="Personalizar tema">
+      <div class="theme-settings-head">
+        <div><strong>🎨 Personalizar aparência</strong><p>Use o degradê azul com violeta como padrão ou crie uma paleta para combinar com um filme, série ou anime da sua estante.</p><div class="theme-preview" aria-hidden="true"></div></div>
+        <button class="btn subtle" id="closeThemeSettings" type="button" aria-label="Fechar configurações de tema">✕ Fechar</button>
+      </div>
+      <div class="theme-grid">
+        <div class="theme-field"><label for="themeMode">Aplicar tema</label><select id="themeMode"><option value="default">Tema padrão da biblioteca</option><option value="title">Inspirado em um título</option></select></div>
+        <div class="theme-field"><label for="themeTitleSelect">Filme / série / anime</label><select id="themeTitleSelect"><option value="">Selecione um título...</option></select></div>
+        <div class="theme-field"><label for="themePreset">Paleta de cores</label><select id="themePreset"><option value="classic">Azul + violeta (padrão)</option><option value="ocean">Azul + turquesa</option><option value="forest">Verde + esmeralda</option><option value="sunset">Laranja + rosa</option><option value="rose">Rosa + roxo</option><option value="gold">Dourado + cobre</option><option value="custom">Personalizada</option></select></div>
+        <div class="theme-field"><label>Cor principal</label><div class="theme-color"><input id="themePrimary" type="color" value="#2563eb" aria-label="Cor principal"><span id="themePrimaryValue">#2563EB</span></div></div>
+        <div class="theme-field"><label>Segunda cor do degradê</label><div class="theme-color"><input id="themeSecondary" type="color" value="#8b5cf6" aria-label="Segunda cor do degradê"><span id="themeSecondaryValue">#8B5CF6</span></div></div>
+      </div>
+      <div class="theme-actions"><button class="btn primary" id="applyThemeBtn" type="button">Aplicar tema</button><button class="btn" id="resetThemeBtn" type="button">Restaurar azul + violeta</button></div>
+      <p class="theme-hint" id="themeHint">O tema padrão é azul + violeta. Ao escolher um título, você pode salvar uma combinação de cores associada a ele. As cores são ajustadas manualmente; o site não extrai automaticamente a paleta de pôsteres.</p>
+    </section>
+
+    <section class="hero" id="libraryHero">
+      <div><div class="eyebrow">Biblioteca pessoal</div><h2>O que vamos assistir?</h2><p>Organize seus filmes, séries, animes e tudo o que quiser acompanhar. Continue exatamente de onde parou.</p></div>
+    </section>
+
+    <nav class="main-nav" aria-label="Seções principais">
+      <button type="button" id="libraryNav" class="active">▤ Minha Biblioteca</button>
+      <button type="button" id="discoverNav">✦ Descobrir</button>
+      <button type="button" id="diaryNav">✎ Diário</button>
+      <button type="button" id="statsNav">▥ Estatísticas</button>
+      <button type="button" id="achievementsNav">🏆 Conquistas</button>
+    </nav>
+
+    <section class="discover-view hidden" id="discoverView" aria-label="Descobrir filmes e séries">
+      <div class="discover-heading"><div class="eyebrow">Explore novas histórias</div><h2>Descobrir</h2><p>Veja sugestões, títulos em alta e próximos lançamentos de filmes, séries e animes. Adicione qualquer resultado à sua biblioteca com um clique.</p></div>
+      <div class="tmdb-setup" id="tmdbSetup">
+        <strong>Conecte o catálogo de filmes e séries</strong>
+        <p>Para carregar recomendações, capas e datas atualizadas, conecte seu token de leitura do TMDB. O acesso da API é gratuito para uso não comercial com atribuição. O token fica salvo somente neste navegador e é enviado diretamente ao TMDB.</p>
+        <div class="tmdb-setup-row"><input id="tmdbTokenInput" type="password" placeholder="Cole aqui seu API Read Access Token" autocomplete="off" aria-label="Token de leitura do TMDB"><button class="btn primary" type="button" id="saveTmdbToken">Conectar</button><button class="btn subtle hidden" type="button" id="removeTmdbToken">Remover token</button></div>
+        <p><a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">Obter token nas configurações do TMDB</a> · <a href="https://developer.themoviedb.org/docs/authentication-application" target="_blank" rel="noopener">Como funciona a autenticação</a></p>
+      </div>
+      <div class="discover-tools"><input id="discoverSearch" type="search" placeholder="Buscar filme, série ou anime..." aria-label="Buscar no catálogo"><button class="btn" id="discoverSearchBtn" type="button">⌕ Buscar</button><button class="btn subtle" id="discoverRefresh" type="button">↻ Atualizar</button></div>
+      <nav class="discover-tabs" aria-label="Categorias para descobrir">
+        <button type="button" data-discover="recommendations" class="active">Para descobrir</button>
+        <button type="button" data-discover="trending">Em alta</button>
+        <button type="button" data-discover="upcomingMovies">Filmes em breve</button>
+        <button type="button" data-discover="upcomingTv">Novas séries</button>
+        <button type="button" data-discover="anime">Animes</button>
+      </nav>
+      <div class="discover-status" id="discoverStatus" aria-live="polite">Conecte sua conta do TMDB para carregar o catálogo atualizado.</div>
+      <section class="discovery-grid" id="discoverGrid" aria-live="polite"><div class="discover-empty"><strong>Seu próximo favorito pode estar aqui.</strong>Configure o acesso ao TMDB para ver sugestões e lançamentos atualizados.</div></section>
+      <div style="display:flex;justify-content:center;margin:18px 0"><button class="btn hidden" id="discoverLoadMore" type="button">Carregar mais títulos</button></div><div class="tmdb-credit"><strong>Sobre os dados:</strong> este produto utiliza a API do TMDB, mas não é endossado nem certificado pelo TMDB. Dados e imagens são fornecidos por <a href="https://www.themoviedb.org" target="_blank" rel="noopener">The Movie Database (TMDB)</a>.</div>
+    </section>
+
+    <section class="personal-view hidden" id="diaryView"><div class="eyebrow">Memórias da sua coleção</div><h2>Diário de assistir</h2><p>Registre o que achou de cada filme, série ou anime que assistiu.</p><form id="diaryForm" class="diary-form"><div id="diaryEditNotice" class="hidden"><strong>Editando registro</strong> <button type="button" class="btn subtle" id="diaryCancelEdit">Cancelar edição</button></div><select id="diaryTitle" required><option value="">Escolha um título da biblioteca</option></select><input id="diaryDate" type="date" required><div class="diary-rating"><strong>Nota:</strong><div class="diary-rating-buttons" id="diaryRatingButtons" role="group" aria-label="Avaliação de zero a cinco estrelas"></div><span class="diary-rating-score" id="diaryRatingScore">0 / 5</span></div><textarea id="diaryText" placeholder="O que achou? Melhor cena, personagens, impressões..."></textarea><button class="btn primary" type="submit" id="diarySaveBtn">Salvar registro</button></form><div class="diary-list" id="diaryList"></div></section>
+    <section class="personal-view hidden" id="statsView"><div class="eyebrow">Seu ano em histórias</div><h2>Estatísticas pessoais</h2><p>Um resumo automático da sua atividade na Minha Estante.</p><div class="personal-stats" id="personalStats"></div><h3>Distribuição por categoria</h3><div id="kindStats"></div></section>
+    <section class="personal-view hidden" id="achievementsView"><div class="eyebrow">Marcos da sua jornada</div><h2>Conquistas</h2><p>Desbloqueie medalhas conforme sua coleção cresce.</p><div class="achievement-grid" id="achievementGrid"></div></section>
+
+    <div id="libraryContent">
+    <section class="stats" aria-label="Resumo da biblioteca">
+      <div class="stat"><div class="stat-top"><span>Na biblioteca</span><span class="stat-icon">▤</span></div><strong id="statTotal">0</strong></div>
+      <div class="stat"><div class="stat-top"><span>Assistindo</span><span class="stat-icon">◉</span></div><strong id="statWatching">0</strong></div>
+      <div class="stat"><div class="stat-top"><span>Quero assistir</span><span class="stat-icon">☆</span></div><strong id="statQueue">0</strong></div>
+      <div class="stat"><div class="stat-top"><span>Concluídos</span><span class="stat-icon">✓</span></div><strong id="statDone">0</strong></div>
+    </section>
+
+    <section class="toolbar">
+      <div class="search-wrap"><span>⌕</span><input id="search" type="search" placeholder="Buscar por título..." aria-label="Buscar por título"></div>
+      <select id="typeFilter" aria-label="Filtrar por tipo"><option value="todos">Todos os tipos</option><option>Filme</option><option>Série</option><option>Anime</option><option>Dorama</option><option>Desenho</option><option>Documentário</option><option>Outro</option></select>
+      <select id="sortFilter" aria-label="Ordenar"><option value="recentes">Mais recentes</option><option value="az">Nome (A–Z)</option><option value="rating">Melhor avaliados</option><option value="updated">Atualizados recentemente</option></select>
+    </section>
+
+
+    <div class="controller-hint" aria-live="polite">
+      <span>🎮 <strong>Controle:</strong> direcional para navegar · confirmar · voltar · adicionar · LB/RB trocar de lista</span>
+      <div class="controller-actions">
+        <span class="controller-status" id="controllerStatus">Conecte um controle para usar</span>
+        <button type="button" class="btn subtle" id="controllerSettingsBtn">⚙ Controle</button>
+      </div>
+    </div>
+    <section class="controller-settings hidden" id="controllerSettings" aria-label="Configurações do controle">
+      <div class="controller-settings-head">
+        <div><strong>Configurar controle</strong><p id="controllerDescription">O site tentará reconhecer o modelo quando você conectar o controle.</p></div>
+        <div class="controller-type-field"><label for="controllerType">Modelo do controle</label>
+          <select id="controllerType">
+            <option value="auto">Detectar automaticamente</option>
+            <option value="xbox">Xbox</option>
+            <option value="playstation">PlayStation 4 / 5</option>
+            <option value="nintendo">Nintendo Switch</option>
+            <option value="generic">Genérico — personalizar botões</option>
+          </select>
+        </div>
+      </div>
+      <div class="controller-mapping hidden" id="genericMapping">
+        <div class="mapping-field"><label for="mapConfirm">Confirmar / selecionar</label><select id="mapConfirm"></select></div>
+        <div class="mapping-field"><label for="mapBack">Voltar / fechar</label><select id="mapBack"></select></div>
+        <div class="mapping-field"><label for="mapAdd">Adicionar título</label><select id="mapAdd"></select></div>
+        <div class="mapping-field"><label for="mapPrev">Lista anterior (LB/L1)</label><select id="mapPrev"></select></div>
+        <div class="mapping-field"><label for="mapNext">Próxima lista (RB/R1)</label><select id="mapNext"></select></div>
+        <div class="mapping-field"><label for="mapStart">Atalho de adicionar (Start)</label><select id="mapStart"></select></div>
+      </div>
+      <p class="controller-foot">A detecção depende do que o navegador informa. Em controles genéricos, escolha o perfil correto ou personalize cada botão acima. Depois, pressione um botão no controle para ativá-lo.</p>
+    </section>
+
+    <nav class="tabs" aria-label="Filtrar por status">
+      <button class="tab active" data-status="todos">Tudo <span id="countTodos">0</span></button>
+      <button class="tab" data-status="quero">Quero assistir <span id="countQuero">0</span></button>
+      <button class="tab" data-status="assistindo">Assistindo <span id="countAssistindo">0</span></button>
+      <button class="tab" data-status="pausado">Pausados <span id="countPausado">0</span></button>
+      <button class="tab" data-status="concluido">Concluídos <span id="countConcluido">0</span></button>
+      <button class="tab" data-status="abandonado">Abandonados <span id="countAbandonado">0</span></button>
+    </nav>
+
+    <div class="section-head"><div><h3 id="listTitle">Sua biblioteca</h3><small id="resultCount">0 títulos</small></div><div class="view-toggle" aria-label="Modo de visualização"><button type="button" id="coversViewBtn" class="active">▦ Capas</button><button type="button" id="dvdViewBtn">▤ Estante de DVDs</button></div></div>
+    <section class="grid" id="mediaGrid" aria-live="polite"></section>
+    </div>
+    <footer><span>✦ Minha Estante · Feito para organizar suas próximas histórias.</span><span>Biblioteca salva neste navegador · Descobrir precisa de internet.</span></footer>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal-head"><h3 id="modalTitle">Adicionar à estante</h3><button class="close" id="closeModal" aria-label="Fechar">×</button></div>
+      <form id="mediaForm">
+        <input type="hidden" id="itemId">
+        <div class="form-grid">
+          <div class="field full"><label for="title">Nome do título *</label><input id="title" required maxlength="120" placeholder="Ex.: One Piece, Interestelar..." autocomplete="off"></div>
+          <div class="field full"><label for="posterUrl">URL da capa (opcional)</label><input id="posterUrl" type="url" placeholder="https://..."><small>Você também pode adicionar capas automaticamente pela seção Descobrir.</small></div>
+          <div class="field"><label for="kind">Tipo</label><select id="kind"><option>Filme</option><option>Série</option><option selected>Anime</option><option>Dorama</option><option>Desenho</option><option>Documentário</option><option>Outro</option></select></div>
+          <div class="field"><label for="status">Status</label><select id="status"><option value="quero">Quero assistir</option><option value="assistindo">Assistindo</option><option value="pausado">Pausado</option><option value="concluido">Concluído</option><option value="abandonado">Abandonado</option></select></div>
+          <div class="field episodic"><label for="season">Temporada</label><input id="season" type="number" min="0" max="999" placeholder="Ex.: 2"></div>
+          <div class="field episodic"><label for="totalSeasons">Total de temporadas</label><input id="totalSeasons" type="number" min="1" max="999" placeholder="Ex.: 5"></div><div class="field episodic"><label for="episode">Episódio atual</label><input id="episode" type="number" min="0" max="99999" placeholder="Ex.: 8"></div>
+          <div class="field episodic"><label for="totalEpisodes">Total de episódios (opcional)</label><input id="totalEpisodes" type="number" min="1" max="99999" placeholder="Ex.: 24"></div>
+          <div class="field"><label for="position">Tempo em que parou</label><input id="position" maxlength="40" placeholder="Ex.: 01:23:45 ou 45 min"><small>Use para marcar o ponto exato de um filme ou episódio.</small></div>
+          <div class="field film-only"><label for="duration">Duração total (minutos)</label><input id="duration" type="number" min="1" max="99999" placeholder="Ex.: 148"></div>
+          <div class="field"><label for="rating">Sua nota (0 a 5 estrelas)</label><input id="rating" type="number" min="0" max="5" step="0.5" placeholder="Ex.: 4.5"></div>
+          <div class="field full"><label for="notes">Anotações (opcional)</label><textarea id="notes" maxlength="1000" placeholder="Onde assistir, opinião, observações... "></textarea></div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn danger hidden" id="deleteBtn">Excluir</button>
+          <div class="modal-actions-right"><button type="button" class="btn" id="cancelBtn">Cancelar</button><button type="submit" class="btn primary">Salvar título</button></div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <div class="vk-backdrop" id="virtualKeyboard" aria-hidden="true">
+    <div class="vk-panel" role="dialog" aria-label="Teclado virtual">
+      <div class="vk-head"><span>⌨ Teclado virtual</span><small>Direcional para escolher · A digita · B fecha</small></div>
+      <div class="vk-rows" id="virtualKeyboardRows"></div>
+    </div>
+  </div>
+
+
+  <script>
+    (() => {
+      'use strict';
+      const STORAGE_KEY = 'minha-estante-v1';
+      const CONTROLLER_KEY = 'minha-estante-controller-v1';
+      const THEME_KEY = 'minha-estante-theme-v1';
+      const VIEW_KEY = 'minha-estante-view-v1';
+      const TMDB_TOKEN_KEY = 'minha-estante-tmdb-token-v1';
+      const THEME_PRESETS = {
+        classic:{label:'Azul + violeta',primary:'#2563eb',secondary:'#8b5cf6'},
+        ocean:{label:'Azul + turquesa',primary:'#0284c7',secondary:'#14b8a6'},
+        forest:{label:'Verde + esmeralda',primary:'#16a34a',secondary:'#0d9488'},
+        sunset:{label:'Laranja + rosa',primary:'#f97316',secondary:'#ec4899'},
+        rose:{label:'Rosa + roxo',primary:'#db2777',secondary:'#8b5cf6'},
+        gold:{label:'Dourado + cobre',primary:'#d97706',secondary:'#b45309'},
+        custom:{label:'Personalizada',primary:'#2563eb',secondary:'#8b5cf6'}
+      };
+      const DEFAULT_THEME_STATE = {mode:'default',activeTitleId:'',default:{preset:'classic',primary:'#2563eb',secondary:'#8b5cf6'},titleThemes:{}};
+      const $ = id => document.getElementById(id);
+      const episodicKinds = ['Série','Anime','Dorama','Desenho'];
+      const statusNames = {todos:'Sua biblioteca',quero:'Quero assistir',assistindo:'Assistindo',pausado:'Pausados',concluido:'Concluídos',abandonado:'Abandonados'};
+      const icons = {Filme:'🎬',Série:'📺',Anime:'⛩️',Dorama:'🌸',Desenho:'🎨',Documentário:'🎥',Outro:'✦'};
+      let items = loadItems();
+      let activeStatus = 'todos';
+      let toastTimer;
+      let themeState = loadThemeState();
+      let libraryViewMode = localStorage.getItem(VIEW_KEY)==='dvd'?'dvd':'covers';
+      let activeMainView = 'library';
+      let activeDiscoverSection = 'recommendations';
+      let discoverCache = {};
+      let discoverLoading = false;
+      let discoverPages = {};
+      let discoverTotalPages = {};
+      let activeDiscoverQuery = '';
+
+      function normalizeThemeConfig(config){
+        const validColor=value=>typeof value==='string'&&/^#[0-9a-f]{6}$/i.test(value);
+        const preset=Object.prototype.hasOwnProperty.call(THEME_PRESETS,config?.preset)?config.preset:'custom';
+        return {
+          preset,
+          primary:validColor(config?.primary)?config.primary:THEME_PRESETS.classic.primary,
+          secondary:validColor(config?.secondary)?config.secondary:THEME_PRESETS.classic.secondary
+        };
+      }
+      function loadThemeState(){
+        try{
+          const saved=JSON.parse(localStorage.getItem(THEME_KEY)||'null');
+          if(!saved||typeof saved!=='object')return structuredClone(DEFAULT_THEME_STATE);
+          const titleThemes={};
+          if(saved.titleThemes&&typeof saved.titleThemes==='object'){
+            Object.entries(saved.titleThemes).forEach(([id,config])=>{titleThemes[id]=normalizeThemeConfig(config);});
+          }
+          return {
+            mode:saved.mode==='title'?'title':'default',
+            activeTitleId:typeof saved.activeTitleId==='string'?saved.activeTitleId:'',
+            default:normalizeThemeConfig(saved.default),titleThemes
+          };
+        }catch{return structuredClone(DEFAULT_THEME_STATE);}
+      }
+      function saveThemeState(){localStorage.setItem(THEME_KEY,JSON.stringify(themeState));}
+      function activeThemeConfig(){
+        if(themeState.mode==='title'&&themeState.activeTitleId&&themeState.titleThemes[themeState.activeTitleId])return themeState.titleThemes[themeState.activeTitleId];
+        return themeState.default;
+      }
+      function hexToRgb(hex){const value=parseInt(hex.slice(1),16);return {r:(value>>16)&255,g:(value>>8)&255,b:value&255};}
+      function applyThemeColors(config){
+        const theme=normalizeThemeConfig(config),root=document.documentElement,primary=hexToRgb(theme.primary),secondary=hexToRgb(theme.secondary);
+        root.style.setProperty('--accent',theme.primary);
+        root.style.setProperty('--accent2',theme.secondary);
+        root.style.setProperty('--accent-soft',`rgba(${primary.r},${primary.g},${primary.b},.18)`);
+        root.style.setProperty('--accent-border',`rgba(${secondary.r},${secondary.g},${secondary.b},.52)`);
+        root.style.setProperty('--accent-glow',`rgba(${primary.r},${primary.g},${primary.b},.23)`);
+        root.style.setProperty('--accent-glow2',`rgba(${secondary.r},${secondary.g},${secondary.b},.18)`);
+        root.style.setProperty('--accent-surface',`rgba(${secondary.r},${secondary.g},${secondary.b},.18)`);
+        const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=theme.primary;
+      }
+      function loadThemeControls(config){
+        const theme=normalizeThemeConfig(config);
+        $('themePreset').value=theme.preset;
+        $('themePrimary').value=theme.primary;$('themeSecondary').value=theme.secondary;
+        $('themePrimaryValue').textContent=theme.primary.toUpperCase();$('themeSecondaryValue').textContent=theme.secondary.toUpperCase();
+        applyThemeColors(theme);
+      }
+      function updateThemeTitleOptions(){
+        const select=$('themeTitleSelect');if(!select)return;
+        const selected=select.value||themeState.activeTitleId||'';
+        select.replaceChildren(new Option('Selecione um título...',''));
+        [...items].sort((a,b)=>a.title.localeCompare(b.title,'pt-BR')).forEach(item=>{
+          const option=new Option(`${item.title} — ${item.kind}`,item.id);select.add(option);
+        });
+        select.value=items.some(item=>item.id===selected)?selected:'';
+        select.disabled=items.length===0;
+        $('themeMode').querySelector('option[value="title"]').disabled=items.length===0;
+      }
+      function syncThemePanel(){
+        updateThemeTitleOptions();
+        $('themeMode').value=themeState.mode;
+        $('themeTitleSelect').value=themeState.activeTitleId||'';
+        const current=activeThemeConfig();loadThemeControls(current);
+        const title=items.find(item=>item.id===themeState.activeTitleId);
+        $('themeHint').textContent=themeState.mode==='title'&&title
+          ?`Tema ativo inspirado em “${title.title}”. Você pode trocar a paleta ou ajustar as duas cores. A escolha fica salva neste navegador.`
+          :'O tema padrão é azul + violeta. Escolha um título cadastrado para criar uma combinação própria. As cores são ajustadas manualmente; o site não extrai automaticamente a paleta de pôsteres.';
+      }
+      function initTheme(){
+        if(themeState.mode==='title'&&!items.some(item=>item.id===themeState.activeTitleId))themeState.mode='default';
+        applyThemeColors(activeThemeConfig());
+        updateThemeTitleOptions();
+      }
+
+      function loadItems(){
+        try { const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); if(!Array.isArray(parsed))return []; const valid=parsed.filter(x=>x&&x.id&&x.title); if(localStorage.getItem('minha-estante-rating-migrated-v1')!=='1'){valid.forEach(x=>{if(x.rating!==null&&x.rating!==undefined&&x.rating!=='')x.rating=Number(x.rating)/2;});localStorage.setItem('minha-estante-rating-migrated-v1','1');localStorage.setItem(STORAGE_KEY,JSON.stringify(valid));}return valid; }
+        catch { return []; }
+      }
+      function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+      function escapeHtml(value){ return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+      function showToast(message){ const el=$('toast'); el.textContent=message; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2300); }
+      function statusText(status){ return statusNames[status] || status; }
+      function openModal(item){
+        $('mediaForm').reset();
+        $('itemId').value = item?.id || '';
+        $('title').value = item?.title || '';
+        $('posterUrl').value = item?.posterUrl || '';
+        $('kind').value = item?.kind || 'Anime';
+        $('status').value = item?.status || 'quero';
+        $('season').value = item?.season ?? '';
+        $('episode').value = item?.episode ?? '';
+        $('totalEpisodes').value = item?.totalEpisodes ?? '';
+        $('position').value = item?.position || '';
+        $('duration').value = item?.duration ?? '';
+        $('rating').value = item?.rating ?? '';
+        $('notes').value = item?.notes || '';
+        $('modalTitle').textContent = item ? 'Editar título' : 'Adicionar à estante';
+        $('deleteBtn').classList.toggle('hidden', !item);
+        updateFormFields();
+        $('modalBackdrop').classList.add('open');
+        setTimeout(()=>$('title').focus(),50);
+      }
+      function closeModal(){ $('modalBackdrop').classList.remove('open'); }
+      function updateFormFields(){
+        const kind=$('kind').value;
+        const isEpisodic=episodicKinds.includes(kind);
+        document.querySelectorAll('.episodic').forEach(el=>el.classList.toggle('hidden',!isEpisodic));
+        document.querySelectorAll('.film-only').forEach(el=>el.classList.toggle('hidden',kind!=='Filme'));
+        $('position').placeholder = kind==='Filme' ? 'Ex.: 01:23:45 ou 83 min' : 'Ex.: 00:18:32';
+      }
+      async function saveForm(event){
+        event.preventDefault();
+        const id=$('itemId').value || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random());
+        const old=items.find(x=>x.id===id);
+        const kind=$('kind').value;let autoTmdbId=null,autoTmdbMediaType=null,autoReleaseDate='',autoOverview='',autoGenreIds=[];
+        if(getTmdbToken()&&(!old||(!old.tmdbId&&(!$('duration').value||!$('totalEpisodes').value)))){try{const mediaType=kind==='Filme'?'movie':'tv';const data=await tmdbRequest('/search/'+mediaType,{query:$('title').value.trim(),include_adult:false,page:1});const candidates=data.results||[];const typedTitle=$('title').value.trim().toLocaleLowerCase('pt-BR');const candidate=candidates.find(x=>(x.title||x.name||'').toLocaleLowerCase('pt-BR')===typedTitle);if(candidate){autoTmdbId=candidate.id;autoTmdbMediaType=mediaType;autoReleaseDate=candidate.release_date||candidate.first_air_date||'';autoOverview=candidate.overview||'';autoGenreIds=candidate.genre_ids||[];const detail=await tmdbRequest('/'+mediaType+'/'+candidate.id);if(kind==='Filme'&&!$('duration').value&&detail.runtime)$('duration').value=detail.runtime;if(episodicKinds.includes(kind)){if(!$('totalEpisodes').value&&detail.number_of_episodes)$('totalEpisodes').value=detail.number_of_episodes;if(!$('totalSeasons').value&&detail.number_of_seasons)$('totalSeasons').value=detail.number_of_seasons;}if(!old){$('posterUrl').value=$('posterUrl').value||(candidate.poster_path?`https://image.tmdb.org/t/p/w500${candidate.poster_path}`:'');}}}catch(err){console.warn('Preenchimento automático TMDB indisponível',err);}}
+        const item={
+          id,title:$('title').value.trim(),kind,status:$('status').value,
+          season:episodicKinds.includes(kind) && $('season').value!=='' ? Number($('season').value) : null,
+          episode:episodicKinds.includes(kind) && $('episode').value!=='' ? Number($('episode').value) : null,
+          totalEpisodes:episodicKinds.includes(kind) && $('totalEpisodes').value!=='' ? Number($('totalEpisodes').value) : null,totalSeasons:episodicKinds.includes(kind) && $('totalSeasons').value!=='' ? Number($('totalSeasons').value) : null,
+          position:$('position').value.trim(),duration:kind==='Filme' && $('duration').value!=='' ? Number($('duration').value) : null,
+          rating:$('rating').value!=='' ? Number($('rating').value) : null,
+          notes:$('notes').value.trim(),posterUrl:$('posterUrl').value.trim() || old?.posterUrl || '',
+          tmdbId:old?.tmdbId || autoTmdbId,tmdbMediaType:old?.tmdbMediaType || autoTmdbMediaType,releaseDate:old?.releaseDate || autoReleaseDate,overview:old?.overview || autoOverview,genreIds:old?.genreIds || autoGenreIds,
+          createdAt:old?.createdAt || Date.now(),updatedAt:Date.now()
+        };
+        if(old) items=items.map(x=>x.id===id?item:x); else items.unshift(item);
+        save(); closeModal(); render(); showToast(old?'Alterações salvas!':'Adicionado à sua estante!');
+      }
+      function getProgress(item){
+        if(item.status==='concluido') return {percent:100,label:'Concluído'};
+        if(item.kind==='Filme' && item.duration && item.position){
+          const match=item.position.match(/\d+(?:[.,]\d+)?/g);
+          if(match){let minutes;if(item.position.includes(':')){const p=item.position.split(':').map(Number);minutes=p.length===3?p[0]*60+p[1]+p[2]/60:p.length===2?p[0]+p[1]/60:Number(match[0]);}else minutes=Number(match[0].replace(',','.'));
+            if(Number.isFinite(minutes)){const percent=Math.max(0,Math.min(100,minutes/item.duration*100));return {percent,label:`${Math.round(percent)}% do filme`};}}
+        }
+        if(episodicKinds.includes(item.kind) && item.totalEpisodes && item.episode!==null){const percent=Math.max(0,Math.min(100,item.episode/item.totalEpisodes*100));return {percent,label:`${Math.round(percent)}% dos episódios`};}
+        return null;
+      }
+      function progressLabel(item){
+        const bits=[];
+        if(episodicKinds.includes(item.kind)){
+          if(item.season!==null && item.season!==undefined && item.season!=='') bits.push(`T${item.season}`);
+          if(item.episode!==null && item.episode!==undefined && item.episode!=='') bits.push(`EP ${item.episode}`);
+          if(item.totalEpisodes) bits.push(`${item.totalEpisodes} eps.`);if(item.totalSeasons)bits.push(`${item.totalSeasons} temporadas`);
+        }
+        if(item.kind==='Filme'&&item.duration)bits.push(`${item.duration} min`);if(item.position) bits.push(`Parou em ${item.position}`);
+        return bits.length ? bits.join(' · ') : (item.status==='concluido'?'Finalizado':'Progresso não informado');
+      }
+      function posterMarkup(item, cls='poster-cover'){
+        if(item.posterUrl){return `<div class="${cls}"><img src="${escapeHtml(item.posterUrl)}" alt="Capa de ${escapeHtml(item.title)}" loading="lazy" onerror="this.parentElement.textContent='${icons[item.kind]||'✦'}'"></div>`;}
+        return `<div class="${cls}">${icons[item.kind]||'✦'}</div>`;
+      }
+      function titleHue(title){let hash=0;for(let i=0;i<title.length;i++)hash=(hash*31+title.charCodeAt(i))|0;return Math.abs(hash)%360;}
+      function starRating(value){let score=Number(value)||0;if(score>5)score/=2;score=Math.max(0,Math.min(5,score));return `<span class="star-rating" aria-label="${score.toLocaleString('pt-BR')} de 5 estrelas">${[1,2,3,4,5].map(n=>`<span class="star" style="--fill:${Math.max(0,Math.min(100,(score-n+1)*100))}%">★</span>`).join('')}</span>`;}
+      function card(item){
+        if(libraryViewMode==='dvd'){
+          const hue=titleHue(item.title),shortTitle=item.title.length>34?item.title.slice(0,32)+'…':item.title;
+          return `<article class="dvd-case" role="button" tabindex="0" aria-label="Editar ${escapeHtml(item.title)}" data-action="edit" data-id="${escapeHtml(item.id)}" style="--dvd-color:hsl(${hue} 46% 35%)" title="${escapeHtml(item.title)} — ${escapeHtml(statusText(item.status))} — ${escapeHtml(progressLabel(item))}"><div class="dvd-spine"><span class="dvd-kind">${icons[item.kind]||'✦'}</span><span class="dvd-title">${escapeHtml(shortTitle)}</span><span class="dvd-ribbon">${escapeHtml(item.kind)} · ${escapeHtml(statusText(item.status))}</span></div><div class="dvd-actions"><button type="button" title="Marcar como concluído" data-action="done" data-id="${escapeHtml(item.id)}">✓</button></div></article>`;
+        }
+        const prog=getProgress(item);
+        const rating=item.rating!==null && item.rating!==undefined ? `<span class="rating">${starRating(Number(item.rating)>5?Number(item.rating)/2:Number(item.rating))} ${Number(item.rating)>5?(Number(item.rating)/2).toLocaleString('pt-BR'):Number(item.rating).toLocaleString('pt-BR')}</span>` : '';
+        const bar=prog ? `<div class="progress"><i style="width:${prog.percent}%"></i></div><div class="progress-note">${escapeHtml(prog.label)}</div>` : '';
+        return `<article class="media-card">
+          <div class="card-top">${posterMarkup(item)}<div class="card-main"><h4>${escapeHtml(item.title)}</h4><div class="meta"><span>${escapeHtml(item.kind)}</span><i class="dot"></i><span class="status ${item.status}">${escapeHtml(statusText(item.status))}</span></div></div></div>
+          <div class="card-info"><span class="position">${escapeHtml(progressLabel(item))}</span>${rating}</div>
+          ${bar}
+          <div class="card-actions"><button class="grow" data-action="edit" data-id="${escapeHtml(item.id)}">✎ Editar / atualizar</button><button title="Marcar como concluído" data-action="done" data-id="${escapeHtml(item.id)}">✓</button></div>
+        </article>`;
+      }
+      function render(){
+        updateThemeTitleOptions();
+        const counts={todos:items.length,quero:0,assistindo:0,pausado:0,concluido:0,abandonado:0};
+        items.forEach(x=>{if(counts[x.status]!==undefined)counts[x.status]++;});
+        $('statTotal').textContent=items.length;
+        $('statWatching').textContent=counts.assistindo;
+        $('statQueue').textContent=counts.quero;
+        $('statDone').textContent=counts.concluido;
+        Object.keys(counts).forEach(k=>{const el=$('count'+k[0].toUpperCase()+k.slice(1));if(el)el.textContent=counts[k];});
+        document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.status===activeStatus));
+        $('listTitle').textContent=statusNames[activeStatus];
+        const query=$('search').value.trim().toLocaleLowerCase('pt-BR');
+        const type=$('typeFilter').value;
+        let filtered=items.filter(x=>(activeStatus==='todos'||x.status===activeStatus)&&(type==='todos'||x.kind===type)&&(!query||x.title.toLocaleLowerCase('pt-BR').includes(query)||String(x.notes||'').toLocaleLowerCase('pt-BR').includes(query)));
+        const sort=$('sortFilter').value;
+        if(sort==='az')filtered.sort((a,b)=>a.title.localeCompare(b.title,'pt-BR'));
+        else if(sort==='rating')filtered.sort((a,b)=>(b.rating??-1)-(a.rating??-1));
+        else if(sort==='updated')filtered.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+        else filtered.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+        $('resultCount').textContent=`${filtered.length} ${filtered.length===1?'título':'títulos'}`;
+        $('mediaGrid').className=libraryViewMode==='dvd'?'dvd-view':'grid';
+        $('coversViewBtn').classList.toggle('active',libraryViewMode==='covers');
+        $('dvdViewBtn').classList.toggle('active',libraryViewMode==='dvd');
+        if(!filtered.length){
+          const hasAny=items.length>0;
+          $('mediaGrid').innerHTML=`<div class="empty"><div class="big">${hasAny?'⌕':'✦'}</div><h3>${hasAny?'Nada encontrado por aqui':'Sua estante está vazia'}</h3><p>${hasAny?'Tente mudar a busca ou os filtros.':'Adicione um filme, série ou anime para começar a organizar.'}</p>${hasAny?'':'<button class="btn primary" id="emptyAdd">＋ Adicionar primeiro título</button>'}</div>`;
+          const emptyAdd=$('emptyAdd');if(emptyAdd)emptyAdd.addEventListener('click',()=>openModal());
+        }else $('mediaGrid').innerHTML=filtered.map(card).join('');
+      }
+      function setLibraryView(mode){
+        libraryViewMode=mode==='dvd'?'dvd':'covers';localStorage.setItem(VIEW_KEY,libraryViewMode);render();
+      }
+      const DIARY_KEY='minhaEstanteDiaryV1';
+      function loadDiary(){try{return JSON.parse(localStorage.getItem(DIARY_KEY)||'[]')}catch{return []}}
+      let diaryEntries=loadDiary();
+      function renderDiary(){const select=$('diaryTitle');const current=select.value;select.innerHTML='<option value="">Escolha um título da biblioteca</option>'+items.map(x=>`<option value="${escapeHtml(x.id)}">${escapeHtml(x.title)}</option>`).join('');if(items.some(x=>x.id===current))select.value=current;$('diaryList').innerHTML=diaryEntries.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(e=>{const item=items.find(x=>x.id===e.itemId);const rating=Number(e.rating)||0;return `<article class="diary-entry"><strong>${escapeHtml(item?.title||e.title||'Título removido')}</strong><br><small>${formatReleaseDate(e.date)}</small>${rating>0?`<div style="margin:5px 0">${starRating(rating)} <span style="color:var(--muted);font-size:12px">${rating.toLocaleString('pt-BR')} / 5</span></div>`:''}<p>${escapeHtml(e.text||'Sem comentário.').replace(/\n/g,'<br>')}</p><div class="diary-entry-actions"><button class="btn subtle" data-diary-edit="${escapeHtml(e.id)}">✎ Editar</button><button class="btn subtle" data-diary-delete="${escapeHtml(e.id)}">Excluir registro</button></div></article>`}).join('')||'<div class="discover-empty">Seu diário ainda está vazio. Registre sua primeira experiência!</div>';}
+      function renderPersonalStats(){const done=items.filter(x=>x.status==='concluido');const episodic=items.filter(x=>episodicKinds.includes(x.kind));const minutes=items.reduce((sum,x)=>sum+(x.status==='concluido'&&x.kind==='Filme'&&Number(x.duration)?Number(x.duration):0),0);const rated=items.filter(x=>Number.isFinite(Number(x.rating))&&x.rating!==null&&x.rating!=='');const avg=rated.length?(rated.reduce((a,x)=>a+(Number(x.rating)>5?Number(x.rating)/2:Number(x.rating)),0)/rated.length).toFixed(1):'—';const stats=[['Concluídos',done.length],['Na biblioteca',items.length],['Episódios acompanhados',episodic.reduce((a,x)=>a+(Number(x.episode)||0),0)],['Horas de filmes registradas',Math.floor(minutes/60)],['Registros no diário',diaryEntries.length],['Média das avaliações',avg+'/5 ⭐']];$('personalStats').innerHTML=stats.map(x=>`<div class="personal-stat"><strong>${x[1]}</strong><span>${x[0]}</span></div>`).join('');const kinds=[...new Set(items.map(x=>x.kind))];$('kindStats').innerHTML=kinds.length?kinds.map(k=>`<p>${escapeHtml(k)} <strong style="float:right">${items.filter(x=>x.kind===k).length}</strong></p>`).join(''):'<p>Adicione títulos para ver sua distribuição.</p>';}
+      function renderAchievements(){const done=items.filter(x=>x.status==='concluido').length;const diary=diaryEntries.length;const episodic=items.filter(x=>episodicKinds.includes(x.kind)&&Number(x.episode)>0).length;const list=[['🌱','Primeiro passo','Adicione seu primeiro título',items.length>=1],['🎬','Sessão encerrada','Conclua seu primeiro título',done>=1],['🍿','Maratona inicial','Conclua 5 títulos',done>=5],['🏆','Colecionador','Conclua 10 títulos',done>=10],['📺','Acompanhando','Registre progresso em uma série ou anime',episodic>=1],['✍️','Crítico','Escreva seu primeiro diário',diary>=1],['📖','Memórias','Faça 10 registros no diário',diary>=10]];$('achievementGrid').innerHTML=list.map(a=>`<article class="achievement ${a[3]?'':'locked'}"><span class="medal">${a[0]}</span><div><strong>${a[1]} ${a[3]?'✓':'🔒'}</strong><small>${a[2]}</small></div></article>`).join('');}
+      function setMainView(view){
+        const views=['library','discover','diary','stats','achievements'];activeMainView=views.includes(view)?view:'library';
+        const isLibrary=activeMainView==='library';$('libraryContent').classList.toggle('hidden',!isLibrary);$('libraryHero').classList.toggle('hidden',!isLibrary);$('discoverView').classList.toggle('hidden',activeMainView!=='discover');
+        ['diary','stats','achievements'].forEach(v=>$(v+'View').classList.toggle('hidden',activeMainView!==v));
+        views.forEach(v=>{const b=$(v+'Nav');if(b)b.classList.toggle('active',activeMainView===v)});
+        if(activeMainView==='diary')renderDiary();if(activeMainView==='stats')renderPersonalStats();if(activeMainView==='achievements')renderAchievements();
+        if(activeMainView==='discover'&&getTmdbToken()&&!discoverCache[activeDiscoverSection])loadDiscovery(activeDiscoverSection);
+      }
+
+
+      // Descoberta e lançamentos usam a API oficial do TMDB. O token é fornecido pelo usuário.
+      function getTmdbToken(){return localStorage.getItem(TMDB_TOKEN_KEY)||'';}
+      async function tmdbRequest(path,params={}){
+        const token=getTmdbToken();if(!token)throw new Error('Configure seu token de leitura do TMDB primeiro.');
+        const url=new URL('https://api.themoviedb.org/3'+path);
+        Object.entries({language:'pt-BR',...params}).forEach(([key,value])=>{if(value!==undefined&&value!==null&&value!=='')url.searchParams.set(key,String(value));});
+        const response=await fetch(url.toString(),{headers:{Authorization:`Bearer ${token}`,Accept:'application/json'}});
+        if(!response.ok){if(response.status===401)throw new Error('Token inválido ou expirado. Confira o API Read Access Token nas configurações do TMDB.');if(response.status===429)throw new Error('O TMDB recebeu muitas solicitações. Aguarde um pouco e tente novamente.');throw new Error(`Não foi possível consultar o TMDB (erro ${response.status}).`);}
+        return response.json();
+      }
+      function localDateISO(date){const y=date.getFullYear(),m=String(date.getMonth()+1).padStart(2,'0'),d=String(date.getDate()).padStart(2,'0');return `${y}-${m}-${d}`;}
+      function formatReleaseDate(value){if(!value)return 'Data não informada';const date=new Date(`${value}T12:00:00`);if(Number.isNaN(date.getTime()))return 'Data não informada';return date.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});}
+      function normalizeDiscoverResult(result,forcedType){
+        const mediaType=forcedType||result.media_type||(result.title?'movie':'tv');
+        return {...result,media_type:mediaType,_title:result.title||result.name||result.original_title||result.original_name||'Sem título',_date:result.release_date||result.first_air_date||'',_kind:mediaType==='movie'?'Filme':((result.original_language==='ja'&&(result.genre_ids||[]).includes(16))?'Anime':'Série')};
+      }
+      async function fetchDiscoverSection(section,page=1){
+        if(section==='trending'){
+          const data=await tmdbRequest('/trending/all/week',{page});
+          return (data.results||[]).filter(x=>x.media_type==='movie'||x.media_type==='tv').map(x=>normalizeDiscoverResult(x));
+        }
+        if(section==='upcomingMovies'){
+          const data=await tmdbRequest('/movie/upcoming',{region:'BR',page});
+          return (data.results||[]).map(x=>normalizeDiscoverResult(x,'movie'));
+        }
+        if(section==='upcomingTv'){
+          const today=new Date(),limit=new Date(today);limit.setFullYear(limit.getFullYear()+1);
+          let data=await tmdbRequest('/discover/tv',{'first_air_date.gte':localDateISO(today),'first_air_date.lte':localDateISO(limit),sort_by:'first_air_date.asc',page});
+          let result=(data.results||[]).map(x=>normalizeDiscoverResult(x,'tv'));
+          if(!result.length){data=await tmdbRequest('/tv/on_the_air',{page});result=(data.results||[]).map(x=>normalizeDiscoverResult(x,'tv'));}
+          return result;
+        }
+        if(section==='anime'){
+          const today=new Date(),limit=new Date(today);limit.setFullYear(limit.getFullYear()+1);
+          const data=await tmdbRequest('/discover/tv',{with_genres:16,with_original_language:'ja','first_air_date.lte':localDateISO(limit),sort_by:'popularity.desc',page});
+          return (data.results||[]).map(x=>normalizeDiscoverResult(x,'tv'));
+        }
+        if(section==='recommendations'){
+          // Tenta associar até três títulos já cadastrados manualmente a IDs do TMDB.
+          const seeds=items.slice().sort((a,b)=>(b.rating??-1)-(a.rating??-1)).slice(0,3);
+          let changed=false;
+          for(const item of seeds){
+            if(item.tmdbId&&item.tmdbMediaType)continue;
+            try{
+              const matchData=await tmdbRequest('/search/multi',{query:item.title,include_adult:false,page:1});
+              const candidate=(matchData.results||[]).filter(x=>x.media_type==='movie'||x.media_type==='tv').find(x=>{
+                const names=[x.title,x.name,x.original_title,x.original_name].filter(Boolean).map(n=>n.toLocaleLowerCase('pt-BR'));
+                return names.includes(item.title.toLocaleLowerCase('pt-BR'));
+              });
+              if(candidate){item.tmdbId=candidate.id;item.tmdbMediaType=candidate.media_type;if(!item.posterUrl&&candidate.poster_path)item.posterUrl=`https://image.tmdb.org/t/p/w500${candidate.poster_path}`;if(!item.releaseDate)item.releaseDate=candidate.release_date||candidate.first_air_date||'';changed=true;}
+            }catch(error){console.warn('Não foi possível associar título existente ao TMDB',error);}
+          }
+          if(changed){save();render();}
+          const linked=items.filter(x=>x.tmdbId&&x.tmdbMediaType).sort((a,b)=>(b.rating??-1)-(a.rating??-1)).slice(0,3);
+          if(linked.length){
+            const all=[];
+            for(const item of linked){try{const data=await tmdbRequest(`/${item.tmdbMediaType}/${item.tmdbId}/recommendations`,{page});all.push(...(data.results||[]).map(x=>normalizeDiscoverResult(x,item.tmdbMediaType)));}catch(error){console.warn('Falha ao buscar recomendação',error);}}
+            const seen=new Set(items.map(x=>String(x.tmdbId||'')));
+            const unique=[];for(const r of all){if(!seen.has(String(r.id))&&!unique.some(x=>x.id===r.id&&x.media_type===r.media_type))unique.push(r);}
+            if(unique.length)return unique;
+          }
+          const fallback=await tmdbRequest('/trending/all/week',{page});
+          return (fallback.results||[]).filter(x=>x.media_type==='movie'||x.media_type==='tv').map(x=>normalizeDiscoverResult(x));
+        }
+        return [];
+      }
+      function renderDiscoverResults(results){
+        const root=$('discoverGrid');
+        if(!results.length){root.innerHTML='<div class="discover-empty"><strong>Nenhum título encontrado.</strong>Tente outra categoria ou uma busca diferente.</div>';return;}
+        root.innerHTML=results.map(result=>{
+          const title=escapeHtml(result._title),date=escapeHtml(formatReleaseDate(result._date)),kind=escapeHtml(result._kind);
+          const poster=result.poster_path?`https://image.tmdb.org/t/p/w342${result.poster_path}`:'';
+          const posterHtml=poster?`<img class="discovery-poster" src="${escapeHtml(poster)}" alt="Capa de ${title}" loading="lazy">`:`<div class="discovery-poster discovery-placeholder">${result.media_type==='movie'?'🎬':'📺'}</div>`;
+          const rating=Number(result.vote_average||0)>0?`★ ${Number(result.vote_average).toFixed(1).replace('.',',')}`:'Sem nota';
+          const overview=escapeHtml(result.overview||'Sinopse ainda não disponível.');
+          const already=items.some(x=>(x.tmdbId&&String(x.tmdbId)===String(result.id)&&x.tmdbMediaType===result.media_type)||(!x.tmdbId&&x.title.toLocaleLowerCase('pt-BR')===result._title.toLocaleLowerCase('pt-BR')));
+          return `<article class="discovery-card">${posterHtml}<div class="discovery-info"><h4>${title}</h4><div class="discovery-meta"><span>${kind}</span><span>${date}</span><span>${rating}</span></div><p class="discovery-overview">${overview}</p><button type="button" class="btn ${already?'':'primary'}" data-discover-add="${escapeHtml(result.id)}" data-media-type="${escapeHtml(result.media_type)}" ${already?'disabled':''}>${already?'✓ Já está na biblioteca':'＋ Adicionar à biblioteca'}</button></div></article>`;
+        }).join('');
+        const resultMap=new Map(results.map(r=>[`${r.media_type}:${r.id}`,r]));
+        root.querySelectorAll('[data-discover-add]').forEach(button=>button.addEventListener('click',async()=>{
+          const result=resultMap.get(`${button.dataset.mediaType}:${button.dataset.discoverAdd}`);if(result){button.disabled=true;button.textContent='Adicionando…';await addDiscoverItem(result);}
+        }));
+      }
+      async function addDiscoverItem(result){
+        const title=result._title||result.title||result.name||'Sem título';
+        if(items.some(x=>(x.tmdbId&&String(x.tmdbId)===String(result.id)&&x.tmdbMediaType===result.media_type)||x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR'))){showToast('Esse título já está na sua biblioteca.');return;}
+        const posterUrl=result.poster_path?`https://image.tmdb.org/t/p/w500${result.poster_path}`:'';
+        let duration=null,totalEpisodes=null,totalSeasons=null;try{const detail=await tmdbRequest(`/${result.media_type}/${result.id}`);duration=result.media_type==='movie'?detail.runtime:(detail.episode_run_time?.[0]||null);totalEpisodes=detail.number_of_episodes||null;totalSeasons=detail.number_of_seasons||null;}catch(err){console.warn('Não foi possível obter detalhes do título',err);}const item={id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()),title,kind:result._kind||normalizeDiscoverResult(result)._kind,status:'quero',season:null,episode:null,totalEpisodes,totalSeasons,position:'',duration,rating:null,notes:result.overview||'',posterUrl,tmdbId:result.id,tmdbMediaType:result.media_type,releaseDate:result._date||result.release_date||result.first_air_date||'',overview:result.overview||'',genreIds:result.genre_ids||[],createdAt:Date.now(),updatedAt:Date.now()};
+        items.unshift(item);save();render();showToast(`“${title}” adicionado à sua lista!`);if(discoverCache[activeDiscoverSection])renderDiscoverResults(discoverCache[activeDiscoverSection]);
+      }
+      async function loadDiscovery(section,force=false){
+        activeDiscoverSection=section;discoverPages[section]=1;discoverTotalPages[section]=1;activeDiscoverQuery='';
+        document.querySelectorAll('[data-discover]').forEach(button=>button.classList.toggle('active',button.dataset.discover===section));
+        if(!getTmdbToken()){$('discoverLoadMore').classList.add('hidden');$('discoverStatus').textContent='Adicione seu token de leitura do TMDB para carregar dados atualizados.';return;}
+        if(discoverLoading)return;
+        document.querySelectorAll('[data-discover]').forEach(button=>button.disabled=true);
+        if(discoverCache[section]&&!force){renderDiscoverResults(discoverCache[section]);$('discoverLoadMore').classList.toggle('hidden',(discoverPages[section]||1)>= (discoverTotalPages[section]||1));$('discoverStatus').textContent=`${discoverCache[section].length} títulos encontrados · atualizado nesta sessão.`;document.querySelectorAll('[data-discover]').forEach(button=>button.disabled=false);return;}
+        discoverLoading=true;$('discoverStatus').textContent='Carregando catálogo atualizado…';$('discoverGrid').innerHTML='<div class="discover-empty">Buscando filmes, séries e animes…</div>';
+        try{
+          const results=await fetchDiscoverSection(section,1);discoverCache[section]=results;discoverPages[section]=1;discoverTotalPages[section]=results.length>=20?10:1;renderDiscoverResults(results);$('discoverLoadMore').classList.toggle('hidden',discoverTotalPages[section]<=1);
+          const labels={recommendations:'Sugestões para descobrir',trending:'Títulos em alta nesta semana',upcomingMovies:'Próximos filmes com data de lançamento no Brasil quando disponível',upcomingTv:'Novas séries previstas para os próximos 12 meses ou séries no ar',anime:'Animes populares no catálogo do TMDB'};
+          $('discoverStatus').textContent=`${labels[section]||'Catálogo'} · ${results.length} resultados · informações do TMDB.`;
+        }catch(error){$('discoverStatus').textContent=error.message;$('discoverGrid').innerHTML=`<div class="discover-empty"><strong>Não foi possível carregar o catálogo.</strong>${escapeHtml(error.message)}<br><br>Verifique sua conexão e o token configurado.</div>`;}
+        finally{discoverLoading=false;document.querySelectorAll('[data-discover]').forEach(button=>button.disabled=false);}
+      }
+      async function loadMoreDiscover(){const section=activeDiscoverSection;const page=(discoverPages[section]||1)+1;if(page>10){$('discoverLoadMore').classList.add('hidden');return;}const button=$('discoverLoadMore');button.disabled=true;button.textContent='Carregando…';try{let extra;if(section==='search'){const data=await tmdbRequest('/search/multi',{query:activeDiscoverQuery,include_adult:false,page});extra=(data.results||[]).filter(x=>x.media_type==='movie'||x.media_type==='tv').map(x=>normalizeDiscoverResult(x));}else extra=await fetchDiscoverSection(section,page);const current=discoverCache[section]||[];const seen=new Set(current.map(x=>`${x.media_type}:${x.id}`));const unique=extra.filter(x=>!seen.has(`${x.media_type}:${x.id}`));discoverCache[section]=current.concat(unique);discoverPages[section]=page;renderDiscoverResults(discoverCache[section]);$('discoverStatus').textContent=`${discoverCache[section].length} títulos carregados.`;discoverTotalPages[section]=unique.length>=20?Math.min(10,page):page;button.classList.toggle('hidden',unique.length<20||page>=10);}catch(error){showToast('Não foi possível carregar mais títulos.');}finally{button.disabled=false;button.textContent='Carregar mais títulos';}}
+      async function searchDiscover(){
+        const query=$('discoverSearch').value.trim();if(!query)return;activeDiscoverQuery=query;discoverPages.search=1;
+        if(!getTmdbToken()){showToast('Configure primeiro o token do TMDB.');return;}
+        activeDiscoverSection='search';document.querySelectorAll('[data-discover]').forEach(button=>button.classList.remove('active'));
+        $('discoverStatus').textContent=`Buscando “${query}”…`;$('discoverGrid').innerHTML='<div class="discover-empty">Pesquisando…</div>';
+        try{const data=await tmdbRequest('/search/multi',{query,include_adult:false,page:1});const results=(data.results||[]).filter(x=>x.media_type==='movie'||x.media_type==='tv').map(x=>normalizeDiscoverResult(x));discoverCache.search=results;discoverPages.search=1;discoverTotalPages.search=results.length>=20?10:1;renderDiscoverResults(results);$('discoverLoadMore').classList.toggle('hidden',results.length<20);$('discoverStatus').textContent=`${results.length} resultados para “${query}”.`;}
+        catch(error){$('discoverStatus').textContent=error.message;$('discoverGrid').innerHTML=`<div class="discover-empty"><strong>Busca não concluída.</strong>${escapeHtml(error.message)}</div>`;}
+      }
+      $('libraryNav').addEventListener('click',()=>setMainView('library'));
+      $('discoverNav').addEventListener('click',()=>setMainView('discover'));
+      $('diaryNav').addEventListener('click',()=>setMainView('diary'));$('statsNav').addEventListener('click',()=>setMainView('stats'));$('achievementsNav').addEventListener('click',()=>setMainView('achievements'));
+      $('diaryDate').value=localDateISO(new Date());let editingDiaryId=null;let diaryRating=0;function renderDiaryRating(){const root=$('diaryRatingButtons');root.innerHTML=[1,2,3,4,5].map(n=>`<button type="button" data-diary-rating="${n}" aria-label="${n} estrela${n>1?'s':''}" class="${diaryRating>=n?'active':diaryRating>=n-0.5?'half':''}">★</button>`).join('');$('diaryRatingScore').textContent=`${diaryRating.toLocaleString('pt-BR')} / 5`;root.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{const n=Number(btn.dataset.diaryRating);diaryRating=diaryRating===n?n-0.5:n;renderDiaryRating();}));}function cancelDiaryEdit(){editingDiaryId=null;diaryRating=0;$('diaryForm').reset();$('diaryDate').value=localDateISO(new Date());$('diaryEditNotice').classList.add('hidden');$('diarySaveBtn').textContent='Salvar registro';renderDiaryRating();renderDiary();}renderDiaryRating();$('diaryCancelEdit').addEventListener('click',cancelDiaryEdit);$('diaryForm').addEventListener('submit',e=>{e.preventDefault();const id=$('diaryTitle').value;if(!id){showToast('Escolha um título.');return;}const item=items.find(x=>x.id===id);const entry={id:editingDiaryId||String(Date.now()),itemId:id,title:item?.title||'',date:$('diaryDate').value,text:$('diaryText').value.trim(),rating:diaryRating};if(editingDiaryId){const index=diaryEntries.findIndex(x=>x.id===editingDiaryId);if(index>=0)diaryEntries[index]=entry;}else diaryEntries.push(entry);localStorage.setItem(DIARY_KEY,JSON.stringify(diaryEntries));const wasEditing=!!editingDiaryId;cancelDiaryEdit();showToast(wasEditing?'Registro atualizado!':'Registro salvo no diário!');});$('diaryList').addEventListener('click',e=>{const edit=e.target.closest('[data-diary-edit]');if(edit){const entry=diaryEntries.find(x=>x.id===edit.dataset.diaryEdit);if(!entry)return;editingDiaryId=entry.id;$('diaryTitle').value=entry.itemId;$('diaryDate').value=entry.date;$('diaryText').value=entry.text||'';diaryRating=Number(entry.rating)||0;renderDiaryRating();$('diaryEditNotice').classList.remove('hidden');$('diarySaveBtn').textContent='Salvar alterações';$('diaryForm').scrollIntoView({behavior:'smooth',block:'start'});return;}const b=e.target.closest('[data-diary-delete]');if(!b)return;if(!confirm('Excluir este registro do diário?'))return;diaryEntries=diaryEntries.filter(x=>x.id!==b.dataset.diaryDelete);localStorage.setItem(DIARY_KEY,JSON.stringify(diaryEntries));renderDiary();});
+      document.querySelectorAll('[data-discover]').forEach(button=>button.addEventListener('click',()=>loadDiscovery(button.dataset.discover)));
+      $('discoverSearchBtn').addEventListener('click',searchDiscover);$('discoverLoadMore').addEventListener('click',loadMoreDiscover);
+      $('discoverSearch').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();searchDiscover();}});
+      $('discoverRefresh').addEventListener('click',()=>activeDiscoverSection==='search'?searchDiscover():loadDiscovery(activeDiscoverSection,true));
+      $('saveTmdbToken').addEventListener('click',async()=>{
+        const token=$('tmdbTokenInput').value.trim();if(!token){showToast('Cole seu token de leitura primeiro.');return;}
+        localStorage.setItem(TMDB_TOKEN_KEY,token);$('removeTmdbToken').classList.remove('hidden');
+        try{await tmdbRequest('/configuration');$('tmdbSetup').querySelector('strong').textContent='✓ TMDB conectado';$('tmdbTokenInput').value='';showToast('TMDB conectado com sucesso!');discoverCache={};loadDiscovery(activeDiscoverSection,true);}
+        catch(error){localStorage.removeItem(TMDB_TOKEN_KEY);$('discoverStatus').textContent=error.message;$('removeTmdbToken').classList.add('hidden');}
+      });
+      $('removeTmdbToken').addEventListener('click',()=>{localStorage.removeItem(TMDB_TOKEN_KEY);discoverCache={};$('removeTmdbToken').classList.add('hidden');$('tmdbSetup').querySelector('strong').textContent='Conecte o catálogo de filmes e séries';$('discoverStatus').textContent='Token removido. Configure novamente para carregar o catálogo.';$('discoverGrid').innerHTML='<div class="discover-empty"><strong>Catálogo desconectado.</strong>Conecte o TMDB para carregar sugestões e lançamentos.</div>';showToast('Token removido deste navegador.');});
+      function initDiscover(){if(getTmdbToken()){$('removeTmdbToken').classList.remove('hidden');$('tmdbSetup').querySelector('strong').textContent='TMDB configurado neste navegador';}}
+
+      function deleteCurrent(){
+        const id=$('itemId').value;const item=items.find(x=>x.id===id);if(!item)return;
+        if(confirm(`Excluir "${item.title}" da sua estante?`)){items=items.filter(x=>x.id!==id);save();closeModal();render();showToast('Título excluído.');}
+      }
+      function markDone(id){const item=items.find(x=>x.id===id);if(!item)return;item.status='concluido';item.updatedAt=Date.now();save();render();showToast('Marcado como concluído!');}
+      function exportData(){
+        const blob=new Blob([JSON.stringify({app:'Minha Estante',version:1,exportedAt:new Date().toISOString(),items},null,2)],{type:'application/json'});
+        const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='minha-estante-backup.json';a.click();URL.revokeObjectURL(url);showToast('Backup preparado!');
+      }
+      function importData(file){
+        const reader=new FileReader();reader.onload=()=>{try{const parsed=JSON.parse(reader.result);const incoming=Array.isArray(parsed)?parsed:parsed.items;if(!Array.isArray(incoming)||incoming.some(x=>!x||typeof x.title!=='string'||!x.title.trim()))throw new Error('invalid');
+          if(!confirm(`Importar ${incoming.length} título(s)? Isso substituirá a biblioteca atual.`))return;
+          items=incoming.map((x,i)=>({...x,id:String(x.id||`import-${Date.now()}-${i}`),createdAt:x.createdAt||Date.now(),updatedAt:x.updatedAt||Date.now()}));save();render();showToast('Backup importado com sucesso!');
+        }catch{alert('Não foi possível importar. Confira se o arquivo é um backup válido da Minha Estante.');}};reader.readAsText(file);
+      }
+
+
+      // O teclado virtual permite preencher campos de texto sem sair do controle.
+      let virtualTarget = null;
+      let virtualShift = false;
+      let keyboardOpen = false;
+      const gamepadStatus = $('controllerStatus');
+      const textInputSelector = 'input:not([type="hidden"]):not([type="file"]):not([type="button"]):not([type="submit"]),textarea';
+      const defaultGenericButtons = {confirm:0,back:1,add:3,prev:4,next:5,start:9};
+      function loadControllerSettings(){
+        try{
+          const saved=JSON.parse(localStorage.getItem(CONTROLLER_KEY)||'{}');
+          const allowed=['auto','xbox','playstation','nintendo','generic'];
+          const type=allowed.includes(saved.type)?saved.type:'auto';
+          return {type,buttons:{...defaultGenericButtons,...(saved.buttons||{})}};
+        }catch{return {type:'auto',buttons:{...defaultGenericButtons}};}
+      }
+      let controllerSettings=loadControllerSettings();
+      let activePad=null;
+      let activePadId='';
+      function saveControllerSettings(){localStorage.setItem(CONTROLLER_KEY,JSON.stringify(controllerSettings));}
+      function detectControllerType(pad){
+        const id=String(pad?.id||'').toLowerCase();
+        if(/nintendo|switch|joy.con|pro controller|057e/.test(id))return 'nintendo';
+        if(/054c|sony|dualshock|dual\s*sense|dualsense|playstation|ps4|ps5/.test(id))return 'playstation';
+        if(/045e|xbox|xinput|microsoft/.test(id))return 'xbox';
+        return 'generic';
+      }
+      function controllerTypeName(type){return ({xbox:'Xbox',playstation:'PlayStation 4 / 5',nintendo:'Nintendo Switch',generic:'Controle genérico'})[type]||'Controle';}
+      function controllerLayoutHint(type){
+        if(type==='xbox')return 'A confirma, B volta e Y adiciona.';
+        if(type==='playstation')return '× confirma, ○ volta e △ adiciona.';
+        if(type==='nintendo')return 'A confirma, B volta e X adiciona.';
+        return 'Defina abaixo quais botões serão usados para confirmar, voltar e navegar.';
+      }
+      function effectiveControllerType(pad=activePad){
+        return controllerSettings.type==='auto'?(pad?detectControllerType(pad):'auto'):controllerSettings.type;
+      }
+      function updateControllerSettingsUI(pad=activePad){
+        const type=effectiveControllerType(pad);
+        const connected=!!pad;
+        $('controllerType').value=controllerSettings.type;
+        $('genericMapping').classList.toggle('hidden',!(type==='generic'&&(connected||controllerSettings.type==='generic')));
+        if(!connected){
+          $('controllerDescription').textContent=controllerSettings.type==='auto'
+            ?'Conecte o controle e pressione um botão. Se ele aparecer como genérico, escolha o modelo ou personalize os botões.'
+            :`Perfil ${controllerTypeName(type)} selecionado manualmente. Conecte o controle para começar. ${controllerLayoutHint(type)}`;
+        }else if(controllerSettings.type==='auto'&&type==='generic'){
+          $('controllerDescription').textContent=`Não consegui identificar a marca de “${pad.id}”. Escolha Xbox, PlayStation ou Nintendo, ou personalize os botões como genérico.`;
+        }else{
+          const mode=controllerSettings.type==='auto'?'Detectado automaticamente':'Perfil selecionado manualmente';
+          $('controllerDescription').textContent=`${mode}: ${controllerTypeName(type)}. ${controllerLayoutHint(type)}`;
+        }
+        for(const [role,id] of Object.entries({confirm:'mapConfirm',back:'mapBack',add:'mapAdd',prev:'mapPrev',next:'mapNext',start:'mapStart'})){
+          const select=$(id); if(select && document.activeElement!==select)select.value=String(controllerSettings.buttons[role]);
+        }
+      }
+      function updateControllerStatus(pad=activePad){
+        activePad=pad;
+        if(!pad){
+          gamepadStatus.textContent='Conecte um controle para usar';
+          gamepadStatus.classList.remove('connected');
+        }else{
+          const type=effectiveControllerType(pad);
+          const desc=type==='generic'?'genérico':controllerTypeName(type);
+          gamepadStatus.textContent=`${desc} conectado${pad.id?' · '+pad.id:''}`;
+          gamepadStatus.classList.add('connected');
+        }
+        updateControllerSettingsUI(pad);
+      }
+      function populateControllerButtonOptions(){
+        const options=Array.from({length:32},(_,i)=>`<option value="${i}">Botão ${i+1} (índice ${i})</option>`).join('');
+        ['mapConfirm','mapBack','mapAdd','mapPrev','mapNext','mapStart'].forEach(id=>$(id).innerHTML=options);
+        updateControllerSettingsUI(null);
+      }
+      function getControllerButtonMap(pad){
+        const type=effectiveControllerType(pad);
+        if(type==='nintendo')return {confirm:1,back:0,add:3,prev:4,next:5,start:9};
+        if(type==='generic')return controllerSettings.buttons;
+        return {confirm:0,back:1,add:3,prev:4,next:5,start:9};
+      }
+      function openVirtualKeyboard(target){
+        if(!target || !target.matches(textInputSelector)) return;
+        virtualTarget=target; virtualShift=false; keyboardOpen=true;
+        $('virtualKeyboard').classList.add('open'); $('virtualKeyboard').setAttribute('aria-hidden','false');
+        renderVirtualKeyboard();
+      }
+      function closeVirtualKeyboard(){
+        if(!keyboardOpen)return;
+        keyboardOpen=false; $('virtualKeyboard').classList.remove('open'); $('virtualKeyboard').setAttribute('aria-hidden','true');
+        const target=virtualTarget; virtualTarget=null;
+        if(target && document.contains(target)) target.focus();
+      }
+      function renderVirtualKeyboard(){
+        const numeric=virtualTarget && virtualTarget.type==='number';
+        const rows=numeric
+          ? [['1','2','3'],['4','5','6'],['7','8','9'],['-','0','.', 'Apagar'],['Limpar','Pronto']]
+          : [['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['Shift','z','x','c','v','b','n','m','Apagar'],['?123','Espaço','Limpar','Pronto']];
+        $('virtualKeyboardRows').innerHTML=rows.map(row=>`<div class="vk-row">${row.map(key=>{
+          const label=key==='Espaço'?'Espaço':key==='Apagar'?'⌫ Apagar':key==='Pronto'?'✓ Pronto':key==='Limpar'?'Limpar':key==='Shift'?(virtualShift?'⇧ Ativo':'⇧'):key;
+          const wide=['Shift','Apagar','?123','Limpar','Pronto'].includes(key);
+          const space=key==='Espaço';
+          const action=['Apagar','Limpar','Pronto','Shift','?123'].includes(key);
+          return `<button type="button" class="vk-key${wide?' wide':''}${space?' space':''}${action?' action':''}" data-vk="${escapeHtml(key)}">${escapeHtml(label)}</button>`;
+        }).join('')}</div>`).join('');
+        $('virtualKeyboardRows').querySelectorAll('[data-vk]').forEach(button=>button.addEventListener('click',()=>pressVirtualKey(button.dataset.vk)));
+        const first=$('virtualKeyboardRows').querySelector('button'); if(first)first.focus();
+      }
+      function pressVirtualKey(key){
+        if(!virtualTarget)return;
+        const target=virtualTarget; let value=target.value || '';
+        if(key==='Pronto'){closeVirtualKeyboard();return;}
+        if(key==='Shift'){virtualShift=!virtualShift;renderVirtualKeyboard();return;}
+        if(key==='?123'){
+          // Campos de texto também podem receber números e pontuação pelo teclado padrão.
+          const rows=[['1','2','3','4','5','6','7','8','9','0'],['@','#','$','%','&','*','(',')','!','?'],['-','_','+','=','/',':',';','"',"'",'Apagar'],['ABC','Espaço','Limpar','Pronto']];
+          $('virtualKeyboardRows').innerHTML=rows.map(row=>`<div class="vk-row">${row.map(k=>`<button type="button" class="vk-key${['Apagar','ABC','Espaço','Limpar','Pronto'].includes(k)?' wide action':''}${k==='Espaço'?' space':''}" data-vk="${escapeHtml(k)}">${k==='Apagar'?'⌫ Apagar':k==='Pronto'?'✓ Pronto':k}</button>`).join('')}</div>`).join('');
+          $('virtualKeyboardRows').querySelectorAll('[data-vk]').forEach(button=>button.addEventListener('click',()=>pressVirtualKey(button.dataset.vk)));
+          $('virtualKeyboardRows').querySelector('button')?.focus(); return;
+        }
+        if(key==='ABC'){renderVirtualKeyboard();return;}
+        if(key==='Apagar') value=value.slice(0,-1);
+        else if(key==='Limpar') value='';
+        else if(key==='Espaço') value+=' ';
+        else value+=virtualShift ? key.toUpperCase() : key;
+        const max=target.maxLength>0?target.maxLength:Infinity;
+        target.value=value.slice(0,max);
+        target.dispatchEvent(new Event('input',{bubbles:true}));
+        target.dispatchEvent(new Event('change',{bubbles:true}));
+        if(virtualShift && key.length===1) {virtualShift=false;renderVirtualKeyboard();}
+      }
+      function isVisible(el){return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length) && !el.closest('.hidden');}
+      function getFocusable(){
+        const root=keyboardOpen ? $('virtualKeyboardRows') : $('modalBackdrop').classList.contains('open') ? document.querySelector('.modal') : document.querySelector('.shell');
+        return [...root.querySelectorAll('button:not(:disabled),input:not(:disabled):not([type="file"]):not([type="hidden"]),select:not(:disabled),textarea:not(:disabled),[tabindex="0"]')].filter(el=>isVisible(el) && el.getAttribute('aria-hidden')!=='true');
+      }
+      function moveGamepadFocus(dx,dy){
+        const elements=getFocusable(); if(!elements.length)return;
+        let current=document.activeElement;
+        if(!elements.includes(current)){
+          const target=elements[0]; target.focus(); target.scrollIntoView({block:'nearest',inline:'nearest'}); return;
+        }
+        const r=current.getBoundingClientRect(), cx=r.left+r.width/2, cy=r.top+r.height/2;
+        let best=null,bestScore=Infinity;
+        for(const el of elements){if(el===current)continue;const b=el.getBoundingClientRect(),x=b.left+b.width/2,y=b.top+b.height/2;const vx=x-cx,vy=y-cy;
+          const primary=dx? vx*dx : vy*dy; if(primary<8)continue;
+          const secondary=dx?Math.abs(vy):Math.abs(vx);
+          const score=primary+secondary*1.65;
+          if(score<bestScore){best=el;bestScore=score;}
+        }
+        if(!best){
+          // Sem opção naquela direção, percorre para a outra extremidade da lista.
+          const idx=elements.indexOf(current), next=elements[(idx+(dx+dy>0?1:-1)+elements.length)%elements.length]; best=next;
+        }
+        if(best){best.focus();best.scrollIntoView({block:'nearest',inline:'nearest'});}
+      }
+      function activateGamepadSelection(){
+        const el=document.activeElement;
+        if(!keyboardOpen && el && el.matches(textInputSelector)){openVirtualKeyboard(el);return;}
+        if(el && typeof el.click==='function')el.click();
+      }
+      function changeActiveTab(direction){
+        if($('modalBackdrop').classList.contains('open') || keyboardOpen)return;
+        const statuses=['todos','quero','assistindo','pausado','concluido','abandonado'];
+        const current=statuses.indexOf(activeStatus);activeStatus=statuses[(current+direction+statuses.length)%statuses.length];render();
+        document.querySelector(`.tab[data-status="${activeStatus}"]`)?.focus();
+      }
+      let previousButtons={},lastNavAt=0,lastDirection='';
+      function gamepadLoop(now){
+        const pads=navigator.getGamepads ? navigator.getGamepads() : [];
+        let pad=null; for(const candidate of pads){if(candidate && candidate.connected){pad=candidate;break;}}
+        if(pad){
+          if(pad.id!==activePadId){activePadId=pad.id;previousButtons={};updateControllerStatus(pad);}
+          const buttonMap=getControllerButtonMap(pad);
+          const pressed=index=>!!pad.buttons[index]?.pressed;
+          const justPressed=index=>index!==undefined&&pressed(Number(index))&&!previousButtons[Number(index)];
+          // D-pad e analógico esquerdo; layout padrão definido pela API do navegador.
+          let dx=0,dy=0; const ax=pad.axes?.[0]||0, ay=pad.axes?.[1]||0;
+          if(pressed(14)||ax<-.55)dx=-1;else if(pressed(15)||ax>.55)dx=1;
+          if(pressed(12)||ay<-.55)dy=-1;else if(pressed(13)||ay>.55)dy=1;
+          const direction=`${dx},${dy}`;
+          if((dx||dy) && (direction!==lastDirection || now-lastNavAt>230)){moveGamepadFocus(dx,dy);lastNavAt=now;}
+          if(!dx&&!dy)lastDirection='';else lastDirection=direction;
+          if(justPressed(buttonMap.confirm))activateGamepadSelection();
+          if(justPressed(buttonMap.back)){if(keyboardOpen)closeVirtualKeyboard();else if($('modalBackdrop').classList.contains('open'))closeModal();}
+          if(justPressed(buttonMap.add) && !$('modalBackdrop').classList.contains('open'))openModal();
+          if(justPressed(buttonMap.prev))changeActiveTab(-1);
+          if(justPressed(buttonMap.next))changeActiveTab(1);
+          if(justPressed(buttonMap.start) && !$('modalBackdrop').classList.contains('open'))openModal();
+          previousButtons=pad.buttons.map(button=>button.pressed);
+        }else{
+          if(activePadId){activePadId='';updateControllerStatus(null);}
+          previousButtons={}; lastDirection='';
+        }
+        requestAnimationFrame(gamepadLoop);
+      }
+      window.addEventListener('gamepadconnected',event=>{activePadId=event.gamepad.id;updateControllerStatus(event.gamepad);previousButtons={};showToast('Controle conectado!');});
+      window.addEventListener('gamepaddisconnected',()=>{activePadId='';updateControllerStatus(null);previousButtons={};showToast('Controle desconectado.');});
+      $('controllerSettingsBtn').addEventListener('click',()=>{
+        const panel=$('controllerSettings');panel.classList.toggle('hidden');
+        if(!panel.classList.contains('hidden'))$('controllerType').focus();
+      });
+      $('controllerType').addEventListener('change',()=>{
+        controllerSettings.type=$('controllerType').value;saveControllerSettings();updateControllerStatus(activePad);
+        showToast(controllerSettings.type==='auto'?'Identificação automática ativada.':`Perfil ${controllerTypeName(controllerSettings.type)} selecionado.`);
+      });
+      const controllerMapFields={mapConfirm:'confirm',mapBack:'back',mapAdd:'add',mapPrev:'prev',mapNext:'next',mapStart:'start'};
+      Object.entries(controllerMapFields).forEach(([id,role])=>$(id).addEventListener('change',()=>{
+        controllerSettings.buttons[role]=Number($(id).value);saveControllerSettings();
+      }));
+      $('virtualKeyboard').addEventListener('click',event=>{if(event.target===$('virtualKeyboard'))closeVirtualKeyboard();});
+
+      function previewThemeFromInputs(){
+        const config={preset:$('themePreset').value,primary:$('themePrimary').value,secondary:$('themeSecondary').value};
+        $('themePrimaryValue').textContent=config.primary.toUpperCase();$('themeSecondaryValue').textContent=config.secondary.toUpperCase();
+        applyThemeColors(config);
+      }
+      function chooseThemePreset(preset){
+        const config=THEME_PRESETS[preset]||THEME_PRESETS.classic;
+        $('themePrimary').value=config.primary;$('themeSecondary').value=config.secondary;
+        $('themePrimaryValue').textContent=config.primary.toUpperCase();$('themeSecondaryValue').textContent=config.secondary.toUpperCase();
+        previewThemeFromInputs();
+      }
+      function closeThemePanel(){
+        $('themeSettings').classList.add('hidden');$('themeSettingsBtn').setAttribute('aria-expanded','false');
+        applyThemeColors(activeThemeConfig());
+      }
+      $('themeSettingsBtn').addEventListener('click',()=>{
+        const panel=$('themeSettings');
+        if(panel.classList.contains('hidden')){panel.classList.remove('hidden');$('themeSettingsBtn').setAttribute('aria-expanded','true');syncThemePanel();$('themeMode').focus();}
+        else closeThemePanel();
+      });
+      $('closeThemeSettings').addEventListener('click',closeThemePanel);
+      $('themeMode').addEventListener('change',()=>{
+        if($('themeMode').value==='title'){
+          if(!$('themeTitleSelect').value&&items.length)$('themeTitleSelect').value=items[0].id;
+          const titleId=$('themeTitleSelect').value;
+          loadThemeControls(themeState.titleThemes[titleId]||themeState.default);
+        }else loadThemeControls(themeState.default);
+      });
+      $('themeTitleSelect').addEventListener('change',()=>{
+        const titleId=$('themeTitleSelect').value;
+        loadThemeControls(themeState.titleThemes[titleId]||themeState.default);
+        if(titleId)$('themeMode').value='title';
+      });
+      $('themePreset').addEventListener('change',()=>{
+        if($('themePreset').value==='custom'){previewThemeFromInputs();return;}
+        chooseThemePreset($('themePreset').value);
+      });
+      ['themePrimary','themeSecondary'].forEach(id=>$(id).addEventListener('input',()=>{
+        $('themePreset').value='custom';previewThemeFromInputs();
+      }));
+      $('applyThemeBtn').addEventListener('click',()=>{
+        const config=normalizeThemeConfig({preset:$('themePreset').value,primary:$('themePrimary').value,secondary:$('themeSecondary').value});
+        const mode=$('themeMode').value,titleId=$('themeTitleSelect').value;
+        if(mode==='title'&&titleId&&items.some(item=>item.id===titleId)){
+          themeState.titleThemes[titleId]=config;themeState.mode='title';themeState.activeTitleId=titleId;
+        }else{
+          themeState.default=config;themeState.mode='default';themeState.activeTitleId='';
+        }
+        saveThemeState();applyThemeColors(activeThemeConfig());syncThemePanel();
+        const title=items.find(item=>item.id===themeState.activeTitleId);
+        showToast(title?`Tema de “${title.title}” aplicado!`:'Tema da biblioteca aplicado!');
+      });
+      $('resetThemeBtn').addEventListener('click',()=>{
+        themeState=structuredClone(DEFAULT_THEME_STATE);saveThemeState();syncThemePanel();
+        showToast('Tema azul + violeta restaurado!');
+      });
+
+      $('addBtn').addEventListener('click',()=>openModal());
+      $('closeModal').addEventListener('click',closeModal);
+      $('cancelBtn').addEventListener('click',closeModal);
+      $('modalBackdrop').addEventListener('click',e=>{if(e.target===$('modalBackdrop'))closeModal();});
+      $('mediaForm').addEventListener('submit',saveForm);
+      $('kind').addEventListener('change',updateFormFields);
+      $('deleteBtn').addEventListener('click',deleteCurrent);
+      $('mediaGrid').addEventListener('click',e=>{const btn=e.target.closest('[data-action]');if(!btn)return;const item=items.find(x=>x.id===btn.dataset.id);if(!item)return;if(btn.dataset.action==='edit')openModal(item);if(btn.dataset.action==='done'){e.stopPropagation();markDone(item.id);}});
+      $('mediaGrid').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.dvd-case')){e.preventDefault();const item=items.find(x=>x.id===e.target.dataset.id);if(item)openModal(item);}});
+      $('coversViewBtn').addEventListener('click',()=>setLibraryView('covers'));
+      $('dvdViewBtn').addEventListener('click',()=>setLibraryView('dvd'));
+      document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{activeStatus=t.dataset.status;render();}));
+      ['search','typeFilter','sortFilter'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
+      $('exportBtn').addEventListener('click',exportData);
+      $('importBtn').addEventListener('click',()=>$('importFile').click());
+      $('importFile').addEventListener('change',e=>{if(e.target.files[0])importData(e.target.files[0]);e.target.value='';});
+      document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(keyboardOpen)closeVirtualKeyboard();else closeModal();}});
+      populateControllerButtonOptions();
+      initTheme();
+      initDiscover();
+      requestAnimationFrame(gamepadLoop);
+      render();
+      setMainView('library');
+    })();
+  </script>
+</body>
+</html>
