@@ -99,7 +99,7 @@
     textarea{resize:vertical;min-height:76px}
     .modal-actions{display:flex;justify-content:space-between;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #ffffff10}
     .modal-actions-right{display:flex;gap:8px}
-    .hidden{display:none!important}
+    .star-rating{display:inline-flex;gap:1px;white-space:nowrap;color:#f5c451;font-size:15px;letter-spacing:0}.star-rating .star{display:inline-block;background:linear-gradient(90deg,#f5c451 var(--fill,100%),#62616a var(--fill,100%));-webkit-background-clip:text;background-clip:text;color:transparent}.diary-entry-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.diary-entry-actions button{font-size:12px}\n    .hidden{display:none!important}
     .toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);background:#e7d8ff;color:#21192b;padding:10px 15px;border-radius:10px;font-weight:700;font-size:13px;opacity:0;pointer-events:none;transition:.22s;z-index:20;box-shadow:var(--shadow)}
     .toast.show{opacity:1;transform:translate(-50%,0)}
 
@@ -268,10 +268,10 @@
       </nav>
       <div class="discover-status" id="discoverStatus" aria-live="polite">Conecte sua conta do TMDB para carregar o catálogo atualizado.</div>
       <section class="discovery-grid" id="discoverGrid" aria-live="polite"><div class="discover-empty"><strong>Seu próximo favorito pode estar aqui.</strong>Configure o acesso ao TMDB para ver sugestões e lançamentos atualizados.</div></section>
-      <div class="tmdb-credit"><strong>Sobre os dados:</strong> este produto utiliza a API do TMDB, mas não é endossado nem certificado pelo TMDB. Dados e imagens são fornecidos por <a href="https://www.themoviedb.org" target="_blank" rel="noopener">The Movie Database (TMDB)</a>.</div>
+      <div style="display:flex;justify-content:center;margin:18px 0"><button class="btn hidden" id="discoverLoadMore" type="button">Carregar mais títulos</button></div><div class="tmdb-credit"><strong>Sobre os dados:</strong> este produto utiliza a API do TMDB, mas não é endossado nem certificado pelo TMDB. Dados e imagens são fornecidos por <a href="https://www.themoviedb.org" target="_blank" rel="noopener">The Movie Database (TMDB)</a>.</div>
     </section>
 
-    <section class="personal-view hidden" id="diaryView"><div class="eyebrow">Memórias da sua coleção</div><h2>Diário de assistir</h2><p>Registre o que achou de cada filme, série ou anime que assistiu.</p><form id="diaryForm" class="diary-form"><select id="diaryTitle" required><option value="">Escolha um título da biblioteca</option></select><input id="diaryDate" type="date" required><textarea id="diaryText" placeholder="O que achou? Melhor cena, personagens, impressões..."></textarea><button class="btn primary" type="submit">Salvar registro</button></form><div class="diary-list" id="diaryList"></div></section>
+    <section class="personal-view hidden" id="diaryView"><div class="eyebrow">Memórias da sua coleção</div><h2>Diário de assistir</h2><p>Registre o que achou de cada filme, série ou anime que assistiu.</p><form id="diaryForm" class="diary-form"><div id="diaryEditNotice" class="hidden"><strong>Editando registro</strong> <button type="button" class="btn subtle" id="diaryCancelEdit">Cancelar edição</button></div><select id="diaryTitle" required><option value="">Escolha um título da biblioteca</option></select><input id="diaryDate" type="date" required><textarea id="diaryText" placeholder="O que achou? Melhor cena, personagens, impressões..."></textarea><button class="btn primary" type="submit" id="diarySaveBtn">Salvar registro</button></form><div class="diary-list" id="diaryList"></div></section>
     <section class="personal-view hidden" id="statsView"><div class="eyebrow">Seu ano em histórias</div><h2>Estatísticas pessoais</h2><p>Um resumo automático da sua atividade na Minha Estante.</p><div class="personal-stats" id="personalStats"></div><h3>Distribuição por categoria</h3><div id="kindStats"></div></section>
     <section class="personal-view hidden" id="achievementsView"><div class="eyebrow">Marcos da sua jornada</div><h2>Conquistas</h2><p>Desbloqueie medalhas conforme sua coleção cresce.</p><div class="achievement-grid" id="achievementGrid"></div></section>
 
@@ -347,11 +347,11 @@
           <div class="field"><label for="kind">Tipo</label><select id="kind"><option>Filme</option><option>Série</option><option selected>Anime</option><option>Dorama</option><option>Desenho</option><option>Documentário</option><option>Outro</option></select></div>
           <div class="field"><label for="status">Status</label><select id="status"><option value="quero">Quero assistir</option><option value="assistindo">Assistindo</option><option value="pausado">Pausado</option><option value="concluido">Concluído</option><option value="abandonado">Abandonado</option></select></div>
           <div class="field episodic"><label for="season">Temporada</label><input id="season" type="number" min="0" max="999" placeholder="Ex.: 2"></div>
-          <div class="field episodic"><label for="episode">Episódio atual</label><input id="episode" type="number" min="0" max="99999" placeholder="Ex.: 8"></div>
+          <div class="field episodic"><label for="totalSeasons">Total de temporadas</label><input id="totalSeasons" type="number" min="1" max="999" placeholder="Ex.: 5"></div><div class="field episodic"><label for="episode">Episódio atual</label><input id="episode" type="number" min="0" max="99999" placeholder="Ex.: 8"></div>
           <div class="field episodic"><label for="totalEpisodes">Total de episódios (opcional)</label><input id="totalEpisodes" type="number" min="1" max="99999" placeholder="Ex.: 24"></div>
           <div class="field"><label for="position">Tempo em que parou</label><input id="position" maxlength="40" placeholder="Ex.: 01:23:45 ou 45 min"><small>Use para marcar o ponto exato de um filme ou episódio.</small></div>
           <div class="field film-only"><label for="duration">Duração total (minutos)</label><input id="duration" type="number" min="1" max="99999" placeholder="Ex.: 148"></div>
-          <div class="field"><label for="rating">Sua nota (0 a 10)</label><input id="rating" type="number" min="0" max="10" step="0.5" placeholder="Ex.: 9"></div>
+          <div class="field"><label for="rating">Sua nota (0 a 5 estrelas)</label><input id="rating" type="number" min="0" max="5" step="0.5" placeholder="Ex.: 4.5"></div>
           <div class="field full"><label for="notes">Anotações (opcional)</label><textarea id="notes" maxlength="1000" placeholder="Onde assistir, opinião, observações... "></textarea></div>
         </div>
         <div class="modal-actions">
@@ -402,6 +402,8 @@
       let activeDiscoverSection = 'recommendations';
       let discoverCache = {};
       let discoverLoading = false;
+      let discoverPages = {};
+      let activeDiscoverQuery = '';
 
       function normalizeThemeConfig(config){
         const validColor=value=>typeof value==='string'&&/^#[0-9a-f]{6}$/i.test(value);
@@ -479,7 +481,7 @@
       }
 
       function loadItems(){
-        try { const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); return Array.isArray(parsed) ? parsed.filter(x => x && x.id && x.title) : []; }
+        try { const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); if(!Array.isArray(parsed))return []; const valid=parsed.filter(x=>x&&x.id&&x.title); if(localStorage.getItem('minha-estante-rating-migrated-v1')!=='1'){valid.forEach(x=>{if(x.rating!==null&&x.rating!==undefined&&x.rating!=='')x.rating=Number(x.rating)/2;});localStorage.setItem('minha-estante-rating-migrated-v1','1');localStorage.setItem(STORAGE_KEY,JSON.stringify(valid));}return valid; }
         catch { return []; }
       }
       function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
@@ -514,20 +516,21 @@
         document.querySelectorAll('.film-only').forEach(el=>el.classList.toggle('hidden',kind!=='Filme'));
         $('position').placeholder = kind==='Filme' ? 'Ex.: 01:23:45 ou 83 min' : 'Ex.: 00:18:32';
       }
-      function saveForm(event){
+      async function saveForm(event){
         event.preventDefault();
         const id=$('itemId').value || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random());
         const old=items.find(x=>x.id===id);
-        const kind=$('kind').value;
+        const kind=$('kind').value;let autoTmdbId=null,autoTmdbMediaType=null,autoReleaseDate='',autoOverview='',autoGenreIds=[];
+        if(getTmdbToken()&&(!old||(!old.tmdbId&&(!$('duration').value||!$('totalEpisodes').value)))){try{const mediaType=kind==='Filme'?'movie':'tv';const data=await tmdbRequest('/search/'+mediaType,{query:$('title').value.trim(),include_adult:false,page:1});const candidates=data.results||[];const typedTitle=$('title').value.trim().toLocaleLowerCase('pt-BR');const candidate=candidates.find(x=>(x.title||x.name||'').toLocaleLowerCase('pt-BR')===typedTitle);if(candidate){autoTmdbId=candidate.id;autoTmdbMediaType=mediaType;autoReleaseDate=candidate.release_date||candidate.first_air_date||'';autoOverview=candidate.overview||'';autoGenreIds=candidate.genre_ids||[];const detail=await tmdbRequest('/'+mediaType+'/'+candidate.id);if(kind==='Filme'&&!$('duration').value&&detail.runtime)$('duration').value=detail.runtime;if(episodicKinds.includes(kind)){if(!$('totalEpisodes').value&&detail.number_of_episodes)$('totalEpisodes').value=detail.number_of_episodes;if(!$('totalSeasons').value&&detail.number_of_seasons)$('totalSeasons').value=detail.number_of_seasons;}if(!old){$('posterUrl').value=$('posterUrl').value||(candidate.poster_path?`https://image.tmdb.org/t/p/w500${candidate.poster_path}`:'');}}}catch(err){console.warn('Preenchimento automático TMDB indisponível',err);}}
         const item={
           id,title:$('title').value.trim(),kind,status:$('status').value,
           season:episodicKinds.includes(kind) && $('season').value!=='' ? Number($('season').value) : null,
           episode:episodicKinds.includes(kind) && $('episode').value!=='' ? Number($('episode').value) : null,
-          totalEpisodes:episodicKinds.includes(kind) && $('totalEpisodes').value!=='' ? Number($('totalEpisodes').value) : null,
+          totalEpisodes:episodicKinds.includes(kind) && $('totalEpisodes').value!=='' ? Number($('totalEpisodes').value) : null,totalSeasons:episodicKinds.includes(kind) && $('totalSeasons').value!=='' ? Number($('totalSeasons').value) : null,
           position:$('position').value.trim(),duration:kind==='Filme' && $('duration').value!=='' ? Number($('duration').value) : null,
           rating:$('rating').value!=='' ? Number($('rating').value) : null,
           notes:$('notes').value.trim(),posterUrl:$('posterUrl').value.trim() || old?.posterUrl || '',
-          tmdbId:old?.tmdbId || null,tmdbMediaType:old?.tmdbMediaType || null,releaseDate:old?.releaseDate || '',overview:old?.overview || '',genreIds:old?.genreIds || [],
+          tmdbId:old?.tmdbId || autoTmdbId,tmdbMediaType:old?.tmdbMediaType || autoTmdbMediaType,releaseDate:old?.releaseDate || autoReleaseDate,overview:old?.overview || autoOverview,genreIds:old?.genreIds || autoGenreIds,
           createdAt:old?.createdAt || Date.now(),updatedAt:Date.now()
         };
         if(old) items=items.map(x=>x.id===id?item:x); else items.unshift(item);
@@ -548,9 +551,9 @@
         if(episodicKinds.includes(item.kind)){
           if(item.season!==null && item.season!==undefined && item.season!=='') bits.push(`T${item.season}`);
           if(item.episode!==null && item.episode!==undefined && item.episode!=='') bits.push(`EP ${item.episode}`);
-          if(item.totalEpisodes) bits.push(`${item.totalEpisodes} eps.`);
+          if(item.totalEpisodes) bits.push(`${item.totalEpisodes} eps.`);if(item.totalSeasons)bits.push(`${item.totalSeasons} temporadas`);
         }
-        if(item.position) bits.push(`Parou em ${item.position}`);
+        if(item.kind==='Filme'&&item.duration)bits.push(`${item.duration} min`);if(item.position) bits.push(`Parou em ${item.position}`);
         return bits.length ? bits.join(' · ') : (item.status==='concluido'?'Finalizado':'Progresso não informado');
       }
       function posterMarkup(item, cls='poster-cover'){
@@ -558,13 +561,14 @@
         return `<div class="${cls}">${icons[item.kind]||'✦'}</div>`;
       }
       function titleHue(title){let hash=0;for(let i=0;i<title.length;i++)hash=(hash*31+title.charCodeAt(i))|0;return Math.abs(hash)%360;}
+      function starRating(value){const score=Math.max(0,Math.min(5,Number(value)||0));return `<span class="star-rating" aria-label="${score.toLocaleString('pt-BR')} de 5 estrelas">${[1,2,3,4,5].map(n=>`<span class="star" style="--fill:${Math.max(0,Math.min(100,(score-n+1)*100))}%">★</span>`).join('')}</span>`;}
       function card(item){
         if(libraryViewMode==='dvd'){
           const hue=titleHue(item.title),shortTitle=item.title.length>34?item.title.slice(0,32)+'…':item.title;
           return `<article class="dvd-case" role="button" tabindex="0" aria-label="Editar ${escapeHtml(item.title)}" data-action="edit" data-id="${escapeHtml(item.id)}" style="--dvd-color:hsl(${hue} 46% 35%)" title="${escapeHtml(item.title)} — ${escapeHtml(statusText(item.status))} — ${escapeHtml(progressLabel(item))}"><div class="dvd-spine"><span class="dvd-kind">${icons[item.kind]||'✦'}</span><span class="dvd-title">${escapeHtml(shortTitle)}</span><span class="dvd-ribbon">${escapeHtml(item.kind)} · ${escapeHtml(statusText(item.status))}</span></div><div class="dvd-actions"><button type="button" title="Marcar como concluído" data-action="done" data-id="${escapeHtml(item.id)}">✓</button></div></article>`;
         }
         const prog=getProgress(item);
-        const rating=item.rating!==null && item.rating!==undefined ? `<span class="rating">★ ${Number(item.rating).toLocaleString('pt-BR')}</span>` : '';
+        const rating=item.rating!==null && item.rating!==undefined ? `<span class="rating">${starRating(Number(item.rating)>5?Number(item.rating)/2:Number(item.rating))} ${Number(item.rating)>5?(Number(item.rating)/2).toLocaleString('pt-BR'):Number(item.rating).toLocaleString('pt-BR')}</span>` : '';
         const bar=prog ? `<div class="progress"><i style="width:${prog.percent}%"></i></div><div class="progress-note">${escapeHtml(prog.label)}</div>` : '';
         return `<article class="media-card">
           <div class="card-top">${posterMarkup(item)}<div class="card-main"><h4>${escapeHtml(item.title)}</h4><div class="meta"><span>${escapeHtml(item.kind)}</span><i class="dot"></i><span class="status ${item.status}">${escapeHtml(statusText(item.status))}</span></div></div></div>
@@ -608,8 +612,8 @@
       const DIARY_KEY='minhaEstanteDiaryV1';
       function loadDiary(){try{return JSON.parse(localStorage.getItem(DIARY_KEY)||'[]')}catch{return []}}
       let diaryEntries=loadDiary();
-      function renderDiary(){const select=$('diaryTitle');const current=select.value;select.innerHTML='<option value="">Escolha um título da biblioteca</option>'+items.map(x=>`<option value="${escapeHtml(x.id)}">${escapeHtml(x.title)}</option>`).join('');if(items.some(x=>x.id===current))select.value=current;$('diaryList').innerHTML=diaryEntries.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(e=>{const item=items.find(x=>x.id===e.itemId);return `<article class="diary-entry"><strong>${escapeHtml(item?.title||e.title||'Título removido')}</strong><br><small>${formatReleaseDate(e.date)}</small><p>${escapeHtml(e.text||'Sem comentário.').replace(/\n/g,'<br>')}</p><button class="btn subtle" data-diary-delete="${escapeHtml(e.id)}">Excluir registro</button></article>`}).join('')||'<div class="discover-empty">Seu diário ainda está vazio. Registre sua primeira experiência!</div>';}
-      function renderPersonalStats(){const done=items.filter(x=>x.status==='concluido');const episodic=items.filter(x=>episodicKinds.includes(x.kind));const minutes=items.reduce((sum,x)=>sum+(x.status==='concluido'&&x.kind==='Filme'&&Number(x.duration)?Number(x.duration):0),0);const rated=items.filter(x=>Number.isFinite(Number(x.rating))&&x.rating!==null&&x.rating!=='');const avg=rated.length?(rated.reduce((a,x)=>a+Number(x.rating),0)/rated.length).toFixed(1):'—';const stats=[['Concluídos',done.length],['Na biblioteca',items.length],['Episódios acompanhados',episodic.reduce((a,x)=>a+(Number(x.episode)||0),0)],['Horas de filmes registradas',Math.floor(minutes/60)],['Registros no diário',diaryEntries.length],['Média das avaliações',avg+'/10']];$('personalStats').innerHTML=stats.map(x=>`<div class="personal-stat"><strong>${x[1]}</strong><span>${x[0]}</span></div>`).join('');const kinds=[...new Set(items.map(x=>x.kind))];$('kindStats').innerHTML=kinds.length?kinds.map(k=>`<p>${escapeHtml(k)} <strong style="float:right">${items.filter(x=>x.kind===k).length}</strong></p>`).join(''):'<p>Adicione títulos para ver sua distribuição.</p>';}
+      function renderDiary(){const select=$('diaryTitle');const current=select.value;select.innerHTML='<option value="">Escolha um título da biblioteca</option>'+items.map(x=>`<option value="${escapeHtml(x.id)}">${escapeHtml(x.title)}</option>`).join('');if(items.some(x=>x.id===current))select.value=current;$('diaryList').innerHTML=diaryEntries.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(e=>{const item=items.find(x=>x.id===e.itemId);return `<article class="diary-entry"><strong>${escapeHtml(item?.title||e.title||'Título removido')}</strong><br><small>${formatReleaseDate(e.date)}</small><p>${escapeHtml(e.text||'Sem comentário.').replace(/\n/g,'<br>')}</p><div class="diary-entry-actions"><button class="btn subtle" data-diary-edit="${escapeHtml(e.id)}">✎ Editar</button><button class="btn subtle" data-diary-delete="${escapeHtml(e.id)}">Excluir registro</button></div></article>`}).join('')||'<div class="discover-empty">Seu diário ainda está vazio. Registre sua primeira experiência!</div>';}
+      function renderPersonalStats(){const done=items.filter(x=>x.status==='concluido');const episodic=items.filter(x=>episodicKinds.includes(x.kind));const minutes=items.reduce((sum,x)=>sum+(x.status==='concluido'&&x.kind==='Filme'&&Number(x.duration)?Number(x.duration):0),0);const rated=items.filter(x=>Number.isFinite(Number(x.rating))&&x.rating!==null&&x.rating!=='');const avg=rated.length?(rated.reduce((a,x)=>a+(Number(x.rating)>5?Number(x.rating)/2:Number(x.rating)),0)/rated.length).toFixed(1):'—';const stats=[['Concluídos',done.length],['Na biblioteca',items.length],['Episódios acompanhados',episodic.reduce((a,x)=>a+(Number(x.episode)||0),0)],['Horas de filmes registradas',Math.floor(minutes/60)],['Registros no diário',diaryEntries.length],['Média das avaliações',avg+'/5 ⭐']];$('personalStats').innerHTML=stats.map(x=>`<div class="personal-stat"><strong>${x[1]}</strong><span>${x[0]}</span></div>`).join('');const kinds=[...new Set(items.map(x=>x.kind))];$('kindStats').innerHTML=kinds.length?kinds.map(k=>`<p>${escapeHtml(k)} <strong style="float:right">${items.filter(x=>x.kind===k).length}</strong></p>`).join(''):'<p>Adicione títulos para ver sua distribuição.</p>';}
       function renderAchievements(){const done=items.filter(x=>x.status==='concluido').length;const diary=diaryEntries.length;const episodic=items.filter(x=>episodicKinds.includes(x.kind)&&Number(x.episode)>0).length;const list=[['🌱','Primeiro passo','Adicione seu primeiro título',items.length>=1],['🎬','Sessão encerrada','Conclua seu primeiro título',done>=1],['🍿','Maratona inicial','Conclua 5 títulos',done>=5],['🏆','Colecionador','Conclua 10 títulos',done>=10],['📺','Acompanhando','Registre progresso em uma série ou anime',episodic>=1],['✍️','Crítico','Escreva seu primeiro diário',diary>=1],['📖','Memórias','Faça 10 registros no diário',diary>=10]];$('achievementGrid').innerHTML=list.map(a=>`<article class="achievement ${a[3]?'':'locked'}"><span class="medal">${a[0]}</span><div><strong>${a[1]} ${a[3]?'✓':'🔒'}</strong><small>${a[2]}</small></div></article>`).join('');}
       function setMainView(view){
         const views=['library','discover','diary','stats','achievements'];activeMainView=views.includes(view)?view:'library';
@@ -637,25 +641,25 @@
         const mediaType=forcedType||result.media_type||(result.title?'movie':'tv');
         return {...result,media_type:mediaType,_title:result.title||result.name||result.original_title||result.original_name||'Sem título',_date:result.release_date||result.first_air_date||'',_kind:mediaType==='movie'?'Filme':((result.original_language==='ja'&&(result.genre_ids||[]).includes(16))?'Anime':'Série')};
       }
-      async function fetchDiscoverSection(section){
+      async function fetchDiscoverSection(section,page=1){
         if(section==='trending'){
-          const data=await tmdbRequest('/trending/all/week',{page:1});
+          const data=await tmdbRequest('/trending/all/week',{page});
           return (data.results||[]).filter(x=>x.media_type==='movie'||x.media_type==='tv').map(x=>normalizeDiscoverResult(x));
         }
         if(section==='upcomingMovies'){
-          const data=await tmdbRequest('/movie/upcoming',{region:'BR',page:1});
+          const data=await tmdbRequest('/movie/upcoming',{region:'BR',page});
           return (data.results||[]).map(x=>normalizeDiscoverResult(x,'movie'));
         }
         if(section==='upcomingTv'){
           const today=new Date(),limit=new Date(today);limit.setFullYear(limit.getFullYear()+1);
-          let data=await tmdbRequest('/discover/tv',{'first_air_date.gte':localDateISO(today),'first_air_date.lte':localDateISO(limit),sort_by:'first_air_date.asc',page:1});
+          let data=await tmdbRequest('/discover/tv',{'first_air_date.gte':localDateISO(today),'first_air_date.lte':localDateISO(limit),sort_by:'first_air_date.asc',page});
           let result=(data.results||[]).map(x=>normalizeDiscoverResult(x,'tv'));
-          if(!result.length){data=await tmdbRequest('/tv/on_the_air',{page:1});result=(data.results||[]).map(x=>normalizeDiscoverResult(x,'tv'));}
+          if(!result.length){data=await tmdbRequest('/tv/on_the_air',{page});result=(data.results||[]).map(x=>normalizeDiscoverResult(x,'tv'));}
           return result;
         }
         if(section==='anime'){
           const today=new Date(),limit=new Date(today);limit.setFullYear(limit.getFullYear()+1);
-          const data=await tmdbRequest('/discover/tv',{with_genres:16,with_original_language:'ja','first_air_date.lte':localDateISO(limit),sort_by:'popularity.desc',page:1});
+          const data=await tmdbRequest('/discover/tv',{with_genres:16,with_original_language:'ja','first_air_date.lte':localDateISO(limit),sort_by:'popularity.desc',page});
           return (data.results||[]).map(x=>normalizeDiscoverResult(x,'tv'));
         }
         if(section==='recommendations'){
@@ -677,12 +681,12 @@
           const linked=items.filter(x=>x.tmdbId&&x.tmdbMediaType).sort((a,b)=>(b.rating??-1)-(a.rating??-1)).slice(0,3);
           if(linked.length){
             const all=[];
-            for(const item of linked){try{const data=await tmdbRequest(`/${item.tmdbMediaType}/${item.tmdbId}/recommendations`,{page:1});all.push(...(data.results||[]).map(x=>normalizeDiscoverResult(x,item.tmdbMediaType)));}catch(error){console.warn('Falha ao buscar recomendação',error);}}
+            for(const item of linked){try{const data=await tmdbRequest(`/${item.tmdbMediaType}/${item.tmdbId}/recommendations`,{page});all.push(...(data.results||[]).map(x=>normalizeDiscoverResult(x,item.tmdbMediaType)));}catch(error){console.warn('Falha ao buscar recomendação',error);}}
             const seen=new Set(items.map(x=>String(x.tmdbId||'')));
             const unique=[];for(const r of all){if(!seen.has(String(r.id))&&!unique.some(x=>x.id===r.id&&x.media_type===r.media_type))unique.push(r);}
-            if(unique.length)return unique.slice(0,24);
+            if(unique.length)return unique;
           }
-          const fallback=await tmdbRequest('/trending/all/week',{page:1});
+          const fallback=await tmdbRequest('/trending/all/week',{page});
           return (fallback.results||[]).filter(x=>x.media_type==='movie'||x.media_type==='tv').map(x=>normalizeDiscoverResult(x));
         }
         return [];
@@ -700,46 +704,47 @@
           return `<article class="discovery-card">${posterHtml}<div class="discovery-info"><h4>${title}</h4><div class="discovery-meta"><span>${kind}</span><span>${date}</span><span>${rating}</span></div><p class="discovery-overview">${overview}</p><button type="button" class="btn ${already?'':'primary'}" data-discover-add="${escapeHtml(result.id)}" data-media-type="${escapeHtml(result.media_type)}" ${already?'disabled':''}>${already?'✓ Já está na biblioteca':'＋ Adicionar à biblioteca'}</button></div></article>`;
         }).join('');
         const resultMap=new Map(results.map(r=>[`${r.media_type}:${r.id}`,r]));
-        root.querySelectorAll('[data-discover-add]').forEach(button=>button.addEventListener('click',()=>{
-          const result=resultMap.get(`${button.dataset.mediaType}:${button.dataset.discoverAdd}`);if(result)addDiscoverItem(result);
+        root.querySelectorAll('[data-discover-add]').forEach(button=>button.addEventListener('click',async()=>{
+          const result=resultMap.get(`${button.dataset.mediaType}:${button.dataset.discoverAdd}`);if(result){button.disabled=true;button.textContent='Adicionando…';await addDiscoverItem(result);}
         }));
       }
-      function addDiscoverItem(result){
+      async function addDiscoverItem(result){
         const title=result._title||result.title||result.name||'Sem título';
         if(items.some(x=>(x.tmdbId&&String(x.tmdbId)===String(result.id)&&x.tmdbMediaType===result.media_type)||x.title.toLocaleLowerCase('pt-BR')===title.toLocaleLowerCase('pt-BR'))){showToast('Esse título já está na sua biblioteca.');return;}
         const posterUrl=result.poster_path?`https://image.tmdb.org/t/p/w500${result.poster_path}`:'';
-        const item={id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()),title,kind:result._kind||normalizeDiscoverResult(result)._kind,status:'quero',season:null,episode:null,totalEpisodes:null,position:'',duration:null,rating:null,notes:result.overview||'',posterUrl,tmdbId:result.id,tmdbMediaType:result.media_type,releaseDate:result._date||result.release_date||result.first_air_date||'',overview:result.overview||'',genreIds:result.genre_ids||[],createdAt:Date.now(),updatedAt:Date.now()};
-        items.unshift(item);save();delete discoverCache.recommendations;render();showToast(`“${title}” adicionado à sua lista!`);renderDiscoverResults(discoverCache[activeDiscoverSection]||[]);
+        let duration=null,totalEpisodes=null,totalSeasons=null;try{const detail=await tmdbRequest(`/${result.media_type}/${result.id}`);duration=result.media_type==='movie'?detail.runtime:(detail.episode_run_time?.[0]||null);totalEpisodes=detail.number_of_episodes||null;totalSeasons=detail.number_of_seasons||null;}catch(err){console.warn('Não foi possível obter detalhes do título',err);}const item={id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()),title,kind:result._kind||normalizeDiscoverResult(result)._kind,status:'quero',season:null,episode:null,totalEpisodes,totalSeasons,position:'',duration,rating:null,notes:result.overview||'',posterUrl,tmdbId:result.id,tmdbMediaType:result.media_type,releaseDate:result._date||result.release_date||result.first_air_date||'',overview:result.overview||'',genreIds:result.genre_ids||[],createdAt:Date.now(),updatedAt:Date.now()};
+        items.unshift(item);save();render();showToast(`“${title}” adicionado à sua lista!`);renderDiscoverResults(discoverCache[activeDiscoverSection]||[]);
       }
       async function loadDiscovery(section,force=false){
-        activeDiscoverSection=section;
+        activeDiscoverSection=section;discoverPages[section]=1;activeDiscoverQuery='';
         document.querySelectorAll('[data-discover]').forEach(button=>button.classList.toggle('active',button.dataset.discover===section));
         if(!getTmdbToken()){$('discoverStatus').textContent='Adicione seu token de leitura do TMDB para carregar dados atualizados.';return;}
         if(discoverLoading)return;
         document.querySelectorAll('[data-discover]').forEach(button=>button.disabled=true);
-        if(discoverCache[section]&&!force){renderDiscoverResults(discoverCache[section]);$('discoverStatus').textContent=`${discoverCache[section].length} títulos encontrados · atualizado nesta sessão.`;document.querySelectorAll('[data-discover]').forEach(button=>button.disabled=false);return;}
+        if(discoverCache[section]&&!force){renderDiscoverResults(discoverCache[section]);$('discoverLoadMore').classList.toggle('hidden',discoverCache[section].length<20);$('discoverStatus').textContent=`${discoverCache[section].length} títulos encontrados · atualizado nesta sessão.`;document.querySelectorAll('[data-discover]').forEach(button=>button.disabled=false);return;}
         discoverLoading=true;$('discoverStatus').textContent='Carregando catálogo atualizado…';$('discoverGrid').innerHTML='<div class="discover-empty">Buscando filmes, séries e animes…</div>';
         try{
-          const results=await fetchDiscoverSection(section);discoverCache[section]=results;renderDiscoverResults(results);
+          const results=await fetchDiscoverSection(section,1);discoverCache[section]=results;renderDiscoverResults(results);$('discoverLoadMore').classList.toggle('hidden',results.length<20);
           const labels={recommendations:'Sugestões para descobrir',trending:'Títulos em alta nesta semana',upcomingMovies:'Próximos filmes com data de lançamento no Brasil quando disponível',upcomingTv:'Novas séries previstas para os próximos 12 meses ou séries no ar',anime:'Animes populares no catálogo do TMDB'};
           $('discoverStatus').textContent=`${labels[section]||'Catálogo'} · ${results.length} resultados · informações do TMDB.`;
         }catch(error){$('discoverStatus').textContent=error.message;$('discoverGrid').innerHTML=`<div class="discover-empty"><strong>Não foi possível carregar o catálogo.</strong>${escapeHtml(error.message)}<br><br>Verifique sua conexão e o token configurado.</div>`;}
         finally{discoverLoading=false;document.querySelectorAll('[data-discover]').forEach(button=>button.disabled=false);}
       }
+      async function loadMoreDiscover(){const section=activeDiscoverSection;const page=(discoverPages[section]||1)+1;if(page>10){$('discoverLoadMore').classList.add('hidden');return;}const button=$('discoverLoadMore');button.disabled=true;button.textContent='Carregando…';try{let extra;if(section==='search'){const data=await tmdbRequest('/search/multi',{query:activeDiscoverQuery,include_adult:false,page});extra=(data.results||[]).filter(x=>x.media_type==='movie'||x.media_type==='tv').map(x=>normalizeDiscoverResult(x));}else extra=await fetchDiscoverSection(section,page);const current=discoverCache[section]||[];const seen=new Set(current.map(x=>`${x.media_type}:${x.id}`));const unique=extra.filter(x=>!seen.has(`${x.media_type}:${x.id}`));discoverCache[section]=current.concat(unique);discoverPages[section]=page;renderDiscoverResults(discoverCache[section]);$('discoverStatus').textContent=`${discoverCache[section].length} títulos carregados.`;button.classList.toggle('hidden',unique.length<20||page>=10);}catch(error){showToast('Não foi possível carregar mais títulos.');}finally{button.disabled=false;button.textContent='Carregar mais títulos';}}
       async function searchDiscover(){
-        const query=$('discoverSearch').value.trim();if(!query)return;
+        const query=$('discoverSearch').value.trim();if(!query)return;activeDiscoverQuery=query;discoverPages.search=1;
         if(!getTmdbToken()){showToast('Configure primeiro o token do TMDB.');return;}
         activeDiscoverSection='search';document.querySelectorAll('[data-discover]').forEach(button=>button.classList.remove('active'));
         $('discoverStatus').textContent=`Buscando “${query}”…`;$('discoverGrid').innerHTML='<div class="discover-empty">Pesquisando…</div>';
-        try{const data=await tmdbRequest('/search/multi',{query,include_adult:false,page:1});const results=(data.results||[]).filter(x=>x.media_type==='movie'||x.media_type==='tv').map(x=>normalizeDiscoverResult(x));discoverCache.search=results;renderDiscoverResults(results);$('discoverStatus').textContent=`${results.length} resultados para “${query}”.`;}
+        try{const data=await tmdbRequest('/search/multi',{query,include_adult:false,page:1});const results=(data.results||[]).filter(x=>x.media_type==='movie'||x.media_type==='tv').map(x=>normalizeDiscoverResult(x));discoverCache.search=results;renderDiscoverResults(results);$('discoverLoadMore').classList.toggle('hidden',results.length<20);$('discoverStatus').textContent=`${results.length} resultados para “${query}”.`;}
         catch(error){$('discoverStatus').textContent=error.message;$('discoverGrid').innerHTML=`<div class="discover-empty"><strong>Busca não concluída.</strong>${escapeHtml(error.message)}</div>`;}
       }
       $('libraryNav').addEventListener('click',()=>setMainView('library'));
       $('discoverNav').addEventListener('click',()=>setMainView('discover'));
       $('diaryNav').addEventListener('click',()=>setMainView('diary'));$('statsNav').addEventListener('click',()=>setMainView('stats'));$('achievementsNav').addEventListener('click',()=>setMainView('achievements'));
-      $('diaryDate').value=localDateISO(new Date());$('diaryForm').addEventListener('submit',e=>{e.preventDefault();const id=$('diaryTitle').value;if(!id){showToast('Escolha um título.');return;}const item=items.find(x=>x.id===id);diaryEntries.push({id:String(Date.now()),itemId:id,title:item?.title||'',date:$('diaryDate').value,text:$('diaryText').value.trim()});localStorage.setItem(DIARY_KEY,JSON.stringify(diaryEntries));$('diaryText').value='';renderDiary();showToast('Registro salvo no diário!');});$('diaryList').addEventListener('click',e=>{const b=e.target.closest('[data-diary-delete]');if(!b)return;diaryEntries=diaryEntries.filter(x=>x.id!==b.dataset.diaryDelete);localStorage.setItem(DIARY_KEY,JSON.stringify(diaryEntries));renderDiary();});
+      $('diaryDate').value=localDateISO(new Date());let editingDiaryId=null;function cancelDiaryEdit(){editingDiaryId=null;$('diaryForm').reset();$('diaryDate').value=localDateISO(new Date());$('diaryEditNotice').classList.add('hidden');$('diarySaveBtn').textContent='Salvar registro';renderDiary();}$('diaryCancelEdit').addEventListener('click',cancelDiaryEdit);$('diaryForm').addEventListener('submit',e=>{e.preventDefault();const id=$('diaryTitle').value;if(!id){showToast('Escolha um título.');return;}const item=items.find(x=>x.id===id);const entry={id:editingDiaryId||String(Date.now()),itemId:id,title:item?.title||'',date:$('diaryDate').value,text:$('diaryText').value.trim()};if(editingDiaryId){const index=diaryEntries.findIndex(x=>x.id===editingDiaryId);if(index>=0)diaryEntries[index]=entry;}else diaryEntries.push(entry);localStorage.setItem(DIARY_KEY,JSON.stringify(diaryEntries));const wasEditing=!!editingDiaryId;cancelDiaryEdit();showToast(wasEditing?'Registro atualizado!':'Registro salvo no diário!');});$('diaryList').addEventListener('click',e=>{const edit=e.target.closest('[data-diary-edit]');if(edit){const entry=diaryEntries.find(x=>x.id===edit.dataset.diaryEdit);if(!entry)return;editingDiaryId=entry.id;$('diaryTitle').value=entry.itemId;$('diaryDate').value=entry.date;$('diaryText').value=entry.text||'';$('diaryEditNotice').classList.remove('hidden');$('diarySaveBtn').textContent='Salvar alterações';$('diaryForm').scrollIntoView({behavior:'smooth',block:'start'});return;}const b=e.target.closest('[data-diary-delete]');if(!b)return;if(!confirm('Excluir este registro do diário?'))return;diaryEntries=diaryEntries.filter(x=>x.id!==b.dataset.diaryDelete);localStorage.setItem(DIARY_KEY,JSON.stringify(diaryEntries));renderDiary();});
       document.querySelectorAll('[data-discover]').forEach(button=>button.addEventListener('click',()=>loadDiscovery(button.dataset.discover)));
-      $('discoverSearchBtn').addEventListener('click',searchDiscover);
+      $('discoverSearchBtn').addEventListener('click',searchDiscover);$('discoverLoadMore').addEventListener('click',loadMoreDiscover);
       $('discoverSearch').addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();searchDiscover();}});
       $('discoverRefresh').addEventListener('click',()=>activeDiscoverSection==='search'?searchDiscover():loadDiscovery(activeDiscoverSection,true));
       $('saveTmdbToken').addEventListener('click',async()=>{
